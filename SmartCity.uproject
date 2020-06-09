@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{76E2EBA4-45AB-F7BD-BA95-6F9F1A25E455}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "SmartCity",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	]
+}
