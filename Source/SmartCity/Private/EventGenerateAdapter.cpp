@@ -37,4 +37,14 @@ void AEventGenerateAdapter::BeginPlay()
 void AEventGenerateAdapter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if ((FVector::Dist(CameraControllor->GetCameraComponent()->GetComponentLocation(),
+                       CameraControllor->GetEarthActor()->GetActorLocation()) - CameraControllor->GetEarthRadius())
+        / CameraControllor->GetEarthRadius() < 0.01)
+    {
+        GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, "Can change mode to Ground!");
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, "Current Camera mode: Fly mode.");
+    }
 }

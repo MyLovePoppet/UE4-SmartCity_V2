@@ -40,14 +40,14 @@ private:
     FVector2D currentCursorPt;
     //中间旋转所绕轴
     FVector MidHoldAxis;
+
+    float ArmLength;
+    FVector OldLocationOnEarth;
 public:
-    virtual void OnLeftMouseUp() override;
-    virtual void OnLeftMouseDown() override;
-    virtual void OnRightMouseUp() override;
-    virtual void OnRightMouseDown() override;
-    virtual void OnMidMouseUp() override;
-    virtual void OnMidMouseDown() override;
-    virtual void OnMouseMove(float Axis) override;
+    virtual void OnMouseUpAction(FKey Key) override;
+    virtual void OnMouseDownAction(FKey Key) override;
+    virtual void OnMouseXMove(float Axis) override;
+    virtual void OnMouseYMove(float Axis) override;
     virtual void OnScrollWheel(float Axis) override;
 
     virtual void BeginPlay() override;
@@ -59,4 +59,5 @@ protected:
     void RotateEarthByAxis(float AngleDeg);
     void CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
     void Zoom(float val);
+    FVector GetHorizontalVector();
 };
