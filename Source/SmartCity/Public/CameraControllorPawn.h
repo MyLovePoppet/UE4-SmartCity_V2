@@ -6,7 +6,6 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Pawn.h"
-#include "GameFramework/SpringArmComponent.h"
 
 #include "CameraControllorPawn.generated.h"
 
@@ -42,13 +41,14 @@ protected:
     UCameraComponent* CameraComponent;
 public:
     virtual void UpdateCameraState();
-    //接收鼠标键盘事件
+    
+    //接收鼠标键盘事件函数
     void OnMouseUp();
     void OnMouseDown();
     void OnKeyUp();
     void OnKeyDown();
     void OnKeyMove(float Axis);
-    //真正的事件处理
+    //真正的事件处理函数
     virtual void OnMouseUpAction(FKey Key);
     virtual void OnMouseDownAction(FKey Key);
     virtual void OnMouseXMove(float Axis);

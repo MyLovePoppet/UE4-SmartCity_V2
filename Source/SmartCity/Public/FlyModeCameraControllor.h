@@ -28,9 +28,9 @@ class SMARTCITY_API AFlyModeCameraControllor : public ACameraControllorPawn
 {
     GENERATED_BODY()
     AFlyModeCameraControllor();
-protected:
-    UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    UStaticMeshComponent* StaticMesh;
+//protected:
+    //UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    //UStaticMeshComponent* StaticMesh;
 
 private:
     uint8 bLeftHold;

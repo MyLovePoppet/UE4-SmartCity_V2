@@ -40,6 +40,7 @@ AGroundCameraControllor::AGroundCameraControllor(): Super()
         CameraComponent->FieldOfView = 90.0f;
         //CameraComponent->SetupAttachment(SpringArm, SpringArm->SocketName);
         CameraComponent->SetupAttachment(CapsuleComponent);
+        //ACameraControllorPawn::UpdateCameraState();
     }
 
 
@@ -76,7 +77,7 @@ void AGroundCameraControllor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    UpdateMeshRotation(DeltaTime);
+    //UpdateMeshRotation(DeltaTime);
 
     //    RootComponent->SetWorldRotation(FRotationMatrix::MakeFromXZ(CurrentForwardDirection, GetActorUpVector()).Rotator());
 }
@@ -103,9 +104,10 @@ void AGroundCameraControllor::BeginPlay()
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
 }
 
+/*
 void AGroundCameraControllor::UpdateMeshRotation(float DeltaTime)
 {
-    /*/
+    
     const float Speed = MovementComponent != NULL ? MovementComponent->Velocity.Size() : 0.0f;
 
     if (Speed < MinVelocityToRotateMesh)//&&bRotateMeshOnlyWhenMoving
@@ -121,9 +123,9 @@ void AGroundCameraControllor::UpdateMeshRotation(float DeltaTime)
         MeshStartRotation.Yaw + Rot.Yaw;
 
     GetMesh()->SetRelativeRotation( MeshRotation);// , MeshRotation, DeltaTime, RotationInterpSpeed);
-    */
+    
 }
-
+*/
 
 void AGroundCameraControllor::Jump()
 {
@@ -207,6 +209,7 @@ void AGroundCameraControllor::AddCameraPitchInput(float ScaleValue)
                                                    CameraPitchMax);
     CameraRelativeRot.Pitch = CameraNewPitch;
     CameraComponent->SetRelativeRotation(CameraRelativeRot);
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 void AGroundCameraControllor::AddCameraYawInput(float ScaleValue)
@@ -217,6 +220,7 @@ void AGroundCameraControllor::AddCameraYawInput(float ScaleValue)
         //GetMesh()->SetRelativeRotation(MeshRotation);
     }*/
     CameraComponent->AddRelativeRotation(FRotator(0.0f, ScaleValue, 0.0f));
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 void AGroundCameraControllor::EnableDebugging()

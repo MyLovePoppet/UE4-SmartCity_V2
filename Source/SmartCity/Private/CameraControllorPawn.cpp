@@ -8,10 +8,7 @@
 // Sets default values
 ACameraControllorPawn::ACameraControllorPawn()
 {
-    // Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-
-    //SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("MyCamera"));
 
@@ -33,7 +30,7 @@ void ACameraControllorPawn::Tick(float DeltaTime)
 
 
     //更新Camera的State
-    UpdateCameraState();
+    //UpdateCameraState();
 }
 
 // Called to bind functionality to input

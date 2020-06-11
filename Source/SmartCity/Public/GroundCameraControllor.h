@@ -30,7 +30,7 @@ class SMARTCITY_API AGroundCameraControllor : public ACameraControllorPawn
 
     virtual void BeginPlay() override;
 
-    virtual void UpdateMeshRotation(float DeltaTime);
+    //virtual void UpdateMeshRotation(float DeltaTime);
 protected:
     /** Minimum view Pitch, in degrees. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom Pawn : Camera Settings")

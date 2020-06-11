@@ -55,34 +55,10 @@ void CameraManipulator::SetHitQueryDistance(const float inHitDist)
 
 AFlyModeCameraControllor::AFlyModeCameraControllor(): Super()
 {
-    // RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-
-    /*SpringArm->SetupAttachment(RootComponent);
-    SpringArm->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-    SpringArm->TargetArmLength = 8000.f;
-    SpringArm->bEnableCameraLag = true;
-    SpringArm->CameraLagSpeed = 6.f;
-    SpringArm->bDoCollisionTest = false;*/
-
-    //CameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
     RootComponent = CameraComponent;
     CameraComponent->bUsePawnControlRotation = false;
     CameraComponent->FieldOfView = 120.f;
     CameraComponent->SetActive(true);
-
-    /*
-    StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh0"));
-    if (StaticMesh)
-    {
-        //StaticMesh->bCastDynamicShadow = true;
-        StaticMesh->bAffectDynamicIndirectLighting = true;
-        //StaticMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-        StaticMesh->SetCollisionProfileName(TEXT("CharacterMesh"));
-        StaticMesh->SetGenerateOverlapEvents(false);
-        //StaticMesh->SetNotifyRigidBodyCollision(false);
-        StaticMesh->SetupAttachment(RootComponent);
-    }*/
-
     bLeftHold = false;
     bMidHold = false;
     bRightHold = false;
@@ -96,6 +72,7 @@ void AFlyModeCameraControllor::BeginPlay()
     ArmLength = (CameraComponent->GetComponentLocation() - EarthActor->GetActorLocation()).Size();
     CameraComponent->SetRelativeRotation(FVector(-1.5, 0, 0).Rotation());
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 
@@ -150,6 +127,7 @@ void AFlyModeCameraControllor::RotateEarthByAxis(float AngleDeg)
     CameraComponent->SetRelativeLocation(TargetLocation);
     FQuat Target = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
     CameraComponent->SetRelativeRotation(Target);
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 void AFlyModeCameraControllor::CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt)
@@ -175,6 +153,7 @@ void AFlyModeCameraControllor::CalcDragRotation(const FVector2D inCursorPt, cons
         FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
         CameraComponent->SetRelativeRotation(TargetQuat);
     }
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 void AFlyModeCameraControllor::Zoom(float Speed)
@@ -222,6 +201,7 @@ void AFlyModeCameraControllor::Zoom(float Speed)
     //调整角度
     FQuat TargetRotation = DeltaAngle.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
     CameraComponent->SetRelativeRotation(TargetRotation);
+    ACameraControllorPawn::UpdateCameraState();
 }
 
 void AFlyModeCameraControllor::OnMouseDownAction(FKey Key)
@@ -299,12 +279,17 @@ void AFlyModeCameraControllor::OnMouseXMove(float Axis)
             FVector TargetLocation = DeltaQuat.UnrotateVector(
                 CameraComponent->GetComponentLocation() - OldLocationOnEarth);
             TargetLocation += OldLocationOnEarth;
-            CameraComponent->SetRelativeLocation(TargetLocation);
-            //方向旋转
-            FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
-            CameraComponent->SetRelativeRotation(TargetQuat);
+            ArmLength = (TargetLocation - EarthActor->GetActorLocation()).Size();
+            if (ArmLength > EarthRadius + 0.01 * EarthRadius)
+            {
+                CameraComponent->SetRelativeLocation(TargetLocation);
+                //方向旋转
+                FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
+                CameraComponent->SetRelativeRotation(TargetQuat);
+            }
 
             oldCursorPt = currentCursorPt;
+            ACameraControllorPawn::UpdateCameraState();
         }
     }
     else if (bRightHold)
