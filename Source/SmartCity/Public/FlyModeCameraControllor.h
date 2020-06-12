@@ -41,8 +41,13 @@ private:
     //中间旋转所绕轴
     FVector MidHoldAxis;
 
+    
     float ArmLength;
     FVector OldLocationOnEarth;
+
+    protected:
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    float ScaleThreashod;
 public:
     virtual void OnMouseUpAction(FKey Key) override;
     virtual void OnMouseDownAction(FKey Key) override;
@@ -60,4 +65,9 @@ protected:
     void CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
     void Zoom(float val);
     FVector GetHorizontalVector();
+
+    void ScaleEarthActor(float Axis);
+
+    //测试用函数
+    virtual void OnKeyDownAction(FKey Key) override;
 };
