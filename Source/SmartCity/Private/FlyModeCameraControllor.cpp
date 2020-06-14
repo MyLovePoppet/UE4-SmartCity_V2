@@ -48,6 +48,50 @@ bool CameraManipulator::LineSphereFirstIntersect(const FVector lineOri, const FV
     return false;
 }
 
+bool CameraManipulator::LineSphereFirstIntersect(const MyFVector lineOri, const MyFVector lineDir,
+    const MyFVector sphereOri, const double radius, MyFVector& intersectPt)
+{
+    //计算球心到直线距离，若距离大于球心，不相交
+    double distToLine = MyFVector::PointDistToLine(sphereOri, lineDir, lineOri);
+    if (distToLine > radius)
+        return false;
+
+    //计算射线起点到球心距离，若小于半径，代表在球内部，返回false
+    double distToSphereOri = MyFVector::Dist(lineOri, sphereOri);
+    if (distToSphereOri <= radius)
+        return false;
+
+    //联立球体方程、射线方程，求解交点
+    MyFVector unitLineDir = lineDir.GetSafeNormal();
+    MyFVector sphereOriToLineOriV = lineOri - sphereOri;
+    double a = MyFVector::DotProduct(unitLineDir, unitLineDir);
+    double b = 2 * MyFVector::DotProduct(unitLineDir, sphereOriToLineOriV);
+    double c = MyFVector::DotProduct(sphereOriToLineOriV, sphereOriToLineOriV) - radius * radius;
+    double b2_4ac = b * b - 4 * a * c;
+
+    if (b2_4ac == 0)
+    {
+        double t = (b * -1.f) / (2 * a);
+        intersectPt = lineOri + lineDir * t;
+        return true;
+    }
+    else if (b2_4ac > 0)
+    {
+        double t1 = (b * -1.f + MyFVector::Sqrt(b2_4ac)) / (2 * a);
+        double t2 = (b * -1.f - MyFVector::Sqrt(b2_4ac)) / (2 * a);
+
+        MyFVector t1_pt = lineOri + lineDir * t1;
+        MyFVector t2_pt = lineOri + lineDir * t2;
+
+        double t1_dist = MyFVector::Dist(lineOri, t1_pt);
+        double t2_dist = MyFVector::Dist(lineOri, t2_pt);
+
+        intersectPt = (t1_dist > t2_dist) ? t2_pt : t1_pt;
+        return true;
+    }
+    return false;
+}
+
 void CameraManipulator::SetHitQueryDistance(const float inHitDist)
 {
     this->hitQueryDistance = inHitDist;
