@@ -4,6 +4,7 @@
 #include "CustomGravityPawnMovement.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UCustomGravityPawnMovement::UCustomGravityPawnMovement(): Super()
 {
@@ -14,12 +15,12 @@ UCustomGravityPawnMovement::UCustomGravityPawnMovement(): Super()
     bIsInAir = false;
     GravityScale = 2.0f;
     bCanJump = true;
-    JumpHeight = 100.0f;
+    JumpHeight = 300.0f;
     ////	GroundHitToleranceDistance = 20.0f;
-    SpeedBoostMultiplier = 2.0f;
+    SpeedBoostMultiplier = 4.0f;
     AirControlRatio = 0.5f;
 
-    //PlanetActor = nullptr;
+    PlanetActor = nullptr;
 
     // Floating Pawn Movement
 
@@ -31,9 +32,30 @@ UCustomGravityPawnMovement::UCustomGravityPawnMovement(): Super()
 void UCustomGravityPawnMovement::TickComponent(float DeltaTime, enum ELevelTick TickType,
                                                FActorComponentTickFunction* ThisTickFunction)
 {
+    FVector Gravity = GetGravityDirection() * GravityPower; //GetGravityZ();
+    Velocity += Gravity * DeltaTime;
+
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
     UpdateCapsuleRotation(DeltaTime, -GetGravityDirection());
+
+    GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red,
+                                     bIsInAir ? TEXT("Air") : TEXT("Ground"));
+
+    /* Local Variables */
+    const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
+    const ECollisionChannel CollisionChannel = CapsuleComponent->GetCollisionObjectType();
+    const FVector TraceStart = CapsuleComponent->GetComponentLocation();
+    const float CapsuleHalfHeight = CapsuleComponent->GetScaledCapsuleHalfHeight();
+    float ShapeRadius = CapsuleComponent->GetScaledCapsuleRadius() * 0.99f;
+    FVector TraceEnd = TraceStart - CapsuleComponent->GetUpVector() * (CapsuleHalfHeight - ShapeRadius + 30.f + 1.0f);
+    FHitResult HitResult;
+    TArray<AActor*> ActorsToIgnore;
+    UKismetSystemLibrary::SphereTraceSingle(this, TraceStart, TraceEnd, ShapeRadius,
+                                            UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true,
+                                            ActorsToIgnore, DrawDebugType, HitResult, true);
+    bIsInAir = !HitResult.bBlockingHit;
+    TimeInAir = bIsInAir ? TimeInAir + DeltaTime : 0.0f;
 }
 
 bool UCustomGravityPawnMovement::IsMovingOnGround() const
@@ -103,7 +125,7 @@ void UCustomGravityPawnMovement::ApplyControlInputToVelocity(float DeltaTime)
     const FVector ControlAcceleration = GetPendingInputVector().GetClampedToMaxSize(1.f);
 
     const float AnalogInputModifier = (ControlAcceleration.SizeSquared() > 0.f ? ControlAcceleration.Size() : 0.f);
-    const float MaxPawnSpeed = GetMaxSpeed() * AnalogInputModifier;
+    const float MaxPawnSpeed = GetMaxSpeed(); // * AnalogInputModifier;
     const bool bExceedingMaxSpeed = IsExceedingMaxSpeed(MaxPawnSpeed);
 
     if (AnalogInputModifier <= 0.f)
@@ -115,13 +137,8 @@ void UCustomGravityPawnMovement::ApplyControlInputToVelocity(float DeltaTime)
             if (!bIsInAir)
             {
                 const float DecelerationSpeed = FMath::Abs(Deceleration) * DeltaTime;
-                if (Velocity.SizeSquared() <= FMath::Square(DecelerationSpeed))
                 {
-                    Velocity = Velocity.ProjectOnToNormal(GetGravityDirection());
-                }
-                else
-                {
-                    Velocity -= FVector::VectorPlaneProject(Velocity.GetSafeNormal(), GetGravityDirection()) *
+                    Velocity -= FVector::VectorPlaneProject(Velocity, GetGravityDirection()).GetSafeNormal() *
                         DecelerationSpeed;
                 }
             }
@@ -134,13 +151,14 @@ void UCustomGravityPawnMovement::ApplyControlInputToVelocity(float DeltaTime)
         }
     }
 
-    FVector Gravity = GetGravityDirection() * GravityPower; //GetGravityZ();
-    Velocity += Gravity * DeltaTime;
 
     // Apply acceleration and clamp velocity magnitude.
-    const float NewMaxSpeed = (IsExceedingMaxSpeed(MaxPawnSpeed)) ? Velocity.Size() : MaxPawnSpeed;
+    //const float NewMaxSpeed = (IsExceedingMaxSpeed(MaxPawnSpeed)) ? Velocity.Size() : MaxPawnSpeed;
     Velocity += ControlAcceleration * FMath::Abs(Acceleration) * DeltaTime;
-    Velocity = Velocity.GetClampedToMaxSize(NewMaxSpeed);
+    FVector TempVelocity = FVector::VectorPlaneProject(Velocity, GetGravityDirection());
+    Velocity -= TempVelocity;
+    TempVelocity = TempVelocity.GetClampedToMaxSize(MaxPawnSpeed);
+    Velocity += TempVelocity;
 
     ConsumeInputVector();
 }

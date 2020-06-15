@@ -121,8 +121,8 @@ void AFlyModeCameraControllor::RotateEarthByAxis(float AngleDeg)
     //得到绕MidHoldAixs轴旋转AngleDeg角度的四元数。
     FQuat DeltaQuat = FQuat(MidHoldAxis, AngleDeg);
     //必须左乘，不可使用AddRotation函数（内部是右乘）
-    //FVector TargetLocation = DeltaQuat.UnrotateVector(CameraComponent->GetComponentLocation() - EarthLocation);
-    FVector TargetLocation=MyFVector::UnrotateVector(DeltaQuat,CameraComponent->GetComponentLocation() - EarthLocation);
+    FVector TargetLocation = DeltaQuat.UnrotateVector(CameraComponent->GetComponentLocation() - EarthLocation);
+    //FVector TargetLocation=MyFVector::UnrotateVector(DeltaQuat,CameraComponent->GetComponentLocation() - EarthLocation);
     TargetLocation += EarthLocation;
     CameraComponent->SetRelativeLocation(TargetLocation);
     FQuat Target = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
@@ -161,7 +161,7 @@ void AFlyModeCameraControllor::Zoom(float Speed)
     const FVector EarthLocation = EarthActor->GetActorLocation();
     FVector EarthToCamera = CameraComponent->GetComponentLocation() - EarthLocation;
 
-    if (ArmLength <= EarthRadius + 50.0f && Speed > 0)
+    if (ArmLength <= EarthRadius + 11.0f && Speed > 0)
         return;
     if (ArmLength >= EarthRadius * 1.80f && Speed < 0)
         return;
@@ -201,6 +201,7 @@ void AFlyModeCameraControllor::Zoom(float Speed)
     //调整角度
     FQuat TargetRotation = DeltaAngle.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
     CameraComponent->SetRelativeRotation(TargetRotation);
+    ScaleBall(Speed);
     ACameraControllorPawn::UpdateCameraState();
 }
 
@@ -335,4 +336,31 @@ FVector AFlyModeCameraControllor::GetHorizontalVector()
     ScreenCursorInfoToWorld(Left, Left3D, Useless);
     ScreenCursorInfoToWorld(Right, Right3D, Useless);
     return (Left3D - Right3D).GetSafeNormal();
+}
+void AFlyModeCameraControllor::ScaleBall(float Sign)
+{
+    float DistanceRate = ArmLength / EarthRadius;
+    //缩放倍率随相机地球距离比线性改变，
+    // 距离比    -> 倍率
+    //(1.8-1.1)->(1-1000)
+    float k = (1.f-1000.f) / (1.8f-1.1f);
+    float b = 1.f - 1.8f * k;
+    NowScale = k * DistanceRate + b;
+    if (NowScale < 1.f || NowScale>1000.f)
+    {
+        return;
+    }
+    if (EarthActor)
+    {
+        //50.f为默认球的默认大小。
+        EarthRadius = 50.f * NowScale;
+        ArmLength = DistanceRate * EarthRadius;
+        CameraComponent->SetRelativeLocation(
+            (CameraComponent->GetComponentLocation() - EarthActor->GetActorLocation()).GetSafeNormal() * ArmLength +
+            EarthActor->GetActorLocation());
+        EarthActor->GetRootComponent()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f) * NowScale);
+    }
+    GEngine->AddOnScreenDebugMessage(0,50.f,FColor::Blue,TEXT("NowScale:")+FString::SanitizeFloat(NowScale));
+    GEngine->AddOnScreenDebugMessage(1,50.f,FColor::Red,TEXT("DistRate:")+FString::SanitizeFloat(DistanceRate));
+    GEngine->AddOnScreenDebugMessage(2,50.f,FColor::Green,TEXT("EarthRadius:")+FString::SanitizeFloat(EarthRadius));
 }

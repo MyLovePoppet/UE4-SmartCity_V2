@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "CameraControllorPawn.h"
-#include "MyFVector.h"
 
 #include "FlyModeCameraControllor.generated.h"
 class AFlyModeCameraControllor;
@@ -46,6 +45,9 @@ private:
 
     float ArmLength;
     FVector OldLocationOnEarth;
+    
+    //当前的球体放大倍数
+    float NowScale;
 public:
     virtual void OnMouseUpAction(FKey Key) override;
     virtual void OnMouseDownAction(FKey Key) override;
@@ -63,4 +65,5 @@ protected:
     void CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
     void Zoom(float val);
     FVector GetHorizontalVector();
+    void ScaleBall(float Sign);
 };
