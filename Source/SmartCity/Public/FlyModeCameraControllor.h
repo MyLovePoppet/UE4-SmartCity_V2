@@ -14,8 +14,6 @@ class CameraManipulator
 public:
     static bool LineSphereFirstIntersect(const FVector lineOri, const FVector lineDir, const FVector sphereOri,
                                          const float radius, FVector& intersectPt);
-    static bool LineSphereFirstIntersect(const MyFVector lineOri, const MyFVector lineDir, const MyFVector sphereOri,
-                                             const double radius, MyFVector& intersectPt);
     
     void SetHitQueryDistance(const float inHitDist);
 
