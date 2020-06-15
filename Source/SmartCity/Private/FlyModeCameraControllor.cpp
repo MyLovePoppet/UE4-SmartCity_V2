@@ -257,9 +257,6 @@ void AFlyModeCameraControllor::OnMouseXMove(float Axis)
             GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
             //GEngine->AddOnScreenDebugMessage(0, 3.f, FColor::Green, currentCursorPt.ToString());
             CalcDragRotation(oldCursorPt, currentCursorPt);
-            //FString s(oldCursorPt.ToString()+" "+currentCursorPt.ToString());
-            //GEngine->AddOnScreenDebugMessage(0,1.0f,FColor::Green,s);
-            GEngine->AddOnScreenDebugMessage(0,1.0f,FColor::Green,CameraComponent->GetRelativeRotation().ToString());
             oldCursorPt = currentCursorPt;
         }
     }
@@ -324,11 +321,6 @@ void AFlyModeCameraControllor::OnScrollWheel(float Axis)
 {
     if (FMath::Abs(Axis) > KINDA_SMALL_NUMBER)
     {
-        if(FVector::Dist(CameraComponent->GetRelativeLocation(),EarthActor->GetActorLocation())<EarthRadius*ScaleThreashod)
-        {
-            ScaleEarthActor(Axis);
-            return;
-        }
         GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
         Zoom(Axis);
     }
@@ -343,31 +335,4 @@ FVector AFlyModeCameraControllor::GetHorizontalVector()
     ScreenCursorInfoToWorld(Left, Left3D, Useless);
     ScreenCursorInfoToWorld(Right, Right3D, Useless);
     return (Left3D - Right3D).GetSafeNormal();
-}
-
-void AFlyModeCameraControllor::ScaleEarthActor(float Axis)
-{
-    
-    float ScaleValue=1.2;
-    if(Axis<0)
-        ScaleValue=1.0f/ScaleValue;
-    if(EarthActor)
-    {
-        FVector Scale=EarthActor->GetRootComponent()->GetRelativeScale3D();
-        EarthActor->GetRootComponent()->SetRelativeScale3D(Scale*ScaleValue);
-        EarthRadius*=ScaleValue;
-        ArmLength=ArmLength*ScaleValue;
-        FVector Dir=CameraComponent->GetRelativeLocation()-EarthActor->GetActorLocation();
-        Dir=Dir.GetSafeNormal();
-        CameraComponent->SetRelativeLocation(Dir*ArmLength);
-        ScaleThreashod=1.0+(ScaleThreashod-1.0)/ScaleValue;
-    }
-}
-
-void AFlyModeCameraControllor::OnKeyDownAction(FKey Key)
-{
-    if(Key==EKeys::SpaceBar)
-    {
-        ScaleEarthActor(-1.0f);
-    }
 }
