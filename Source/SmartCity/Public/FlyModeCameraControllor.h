@@ -8,20 +8,6 @@
 #include "FlyModeCameraControllor.generated.h"
 class AFlyModeCameraControllor;
 
-class CameraManipulator
-{
-public:
-    static bool LineSphereFirstIntersect(const FVector lineOri, const FVector lineDir, const FVector sphereOri,
-                                         const float radius, FVector& intersectPt);
-    
-    void SetHitQueryDistance(const float inHitDist);
-
-    FVector TrackballCenter;
-    float TrackballRadius;
-    AFlyModeCameraControllor* cameraOwner;
-    float hitQueryDistance;
-};
-
 /**
  * 
  */
@@ -29,41 +15,69 @@ UCLASS()
 class SMARTCITY_API AFlyModeCameraControllor : public ACameraControllorPawn
 {
     GENERATED_BODY()
-    AFlyModeCameraControllor();
-//protected:
-    //UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    //UStaticMeshComponent* StaticMesh;
 
-private:
-    uint8 bLeftHold;
-    uint8 bMidHold;
-    uint8 bRightHold;
-    FVector2D oldCursorPt;
-    FVector2D currentCursorPt;
-    //中间旋转所绕轴
-    FVector MidHoldAxis;
-
-    float ArmLength;
-    FVector OldLocationOnEarth;
-    
-    //当前的球体放大倍数
-    float NowScale;
 public:
-    virtual void OnMouseUpAction(FKey Key) override;
-    virtual void OnMouseDownAction(FKey Key) override;
-    virtual void OnMouseXMove(float Axis) override;
-    virtual void OnMouseYMove(float Axis) override;
-    virtual void OnScrollWheel(float Axis) override;
+    bool LineSphereFirstIntersect(FVector lineOri, FVector lineDir, FVector sphereOri, float radius,
+                                  FVector& intersectPt);
+    // Sets default values for this pawn's properties
+    AFlyModeCameraControllor();
 
-    virtual void BeginPlay() override;
+
+    //后续缩放比例
+    float NowScale = 1.f;
+    //初始缩放，后续的缩放都会乘以该缩放。
+    UPROPERTY(Category = "Custom Pawn", EditAnywhere)
+    float InitScale = 0.0001f;
+    //使DebugLine的粗细随Scale变化。
+    float Thickness = 10;
+
 protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
+    //原始缩放为1时，地球的大小
+    UPROPERTY(Category = "Custom Pawn", EditAnywhere)
+    float OriginRadius = 6378137.f;
+    UPROPERTY(Category = "Custom Pawn", EditAnywhere)
+    float ArmLength;
 
     bool ScreenCursorInfoToWorld(const FVector2D screenCursorPt, FVector& WorldPt, FVector& WorldDir);
-    bool CursorPointOnEarth(FVector2D CursorPoint, FVector& intersectPt);
-    FVector GetPointToCenterVector(FVector TouchPoint);
-    void RotateEarthByAxis(float AngleDeg);
+
     void CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
-    void Zoom(float val);
+
+    bool CursorPointOnEarth(FVector2D CursorPoint, FVector& intersectPt);
+
+    FVector GetPointToCenterVector(FVector TouchPoint);
+
+    void RotateEarthByAxis(float AngleDeg);
+    void ScaleBall(float Sign = 1.f);
+
     FVector GetHorizontalVector();
-    void ScaleBall(float Sign);
+
+    void Zoom(float Speed);
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
+
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    virtual void LeftButtonDown();
+    virtual void LeftButtonUp();
+    virtual void LeftButtonHold(float val);
+
+    virtual void MidButtonDown();
+    virtual void MidButtonUp();
+    virtual void MidButtonHold(float val);
+
+    virtual void RightButtonDown();
+    virtual void RightButtonHold(float val);
+
+    virtual void OnScrollWheelUpPress(float val);
+private:
+    FVector2D oldCursorPt;
+    FVector2D currentCursorPt;
+
+    //中间旋转所绕轴
+    FVector MidHoldAxis;
+    FVector OldLocationOnEarth;
 };

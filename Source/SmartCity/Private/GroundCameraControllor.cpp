@@ -3,6 +3,8 @@
 
 #include "GroundCameraControllor.h"
 
+
+#include "GameFramework/PlayerInput.h"
 #include "Kismet/GameplayStatics.h"
 // Sets default values
 AGroundCameraControllor::AGroundCameraControllor(): Super()
@@ -196,14 +198,6 @@ void AGroundCameraControllor::AddRightMovementInput(float ScaleValue)
 
 void AGroundCameraControllor::AddCameraPitchInput(float ScaleValue)
 {
-    /*if (SpringArm != nullptr)
-    {
-        FRotator CameraRelativeRot = SpringArm->GetRelativeRotation();
-        const float CameraNewPitch = FMath::ClampAngle(CameraRelativeRot.Pitch + ScaleValue, CameraPitchMin,
-                                                       CameraPitchMax);
-        CameraRelativeRot.Pitch = CameraNewPitch;
-        SpringArm->SetRelativeRotation(CameraRelativeRot);
-    }*/
     FRotator CameraRelativeRot = CameraComponent->GetRelativeRotation();
     const float CameraNewPitch = FMath::ClampAngle(CameraRelativeRot.Pitch + ScaleValue, CameraPitchMin,
                                                    CameraPitchMax);
@@ -214,11 +208,6 @@ void AGroundCameraControllor::AddCameraPitchInput(float ScaleValue)
 
 void AGroundCameraControllor::AddCameraYawInput(float ScaleValue)
 {
-    /*if (SpringArm != nullptr)
-    {
-        SpringArm->AddRelativeRotation(FRotator(0.0f, ScaleValue, 0.0f));
-        //GetMesh()->SetRelativeRotation(MeshRotation);
-    }*/
     CameraComponent->AddRelativeRotation(FRotator(0.0f, ScaleValue, 0.0f));
     ACameraControllorPawn::UpdateCameraState();
 }
@@ -266,47 +255,30 @@ UPawnMovementComponent* AGroundCameraControllor::GetMovementComponent() const
     return MovementComponent;
 }
 
-void AGroundCameraControllor::OnKeyUpAction(FKey Key)
+void AGroundCameraControllor::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    if (Key == EKeys::SpaceBar)
-    {
-    }
-    else if (Key == EKeys::LeftShift)
-    {
-        this->StopSprint();
-    }
-}
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    //鼠标移动
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseX", EKeys::MouseX, 1.0f));
+    PlayerInputComponent->BindAxis("MouseX", this, &AGroundCameraControllor::AddCameraYawInput);
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseY", EKeys::MouseY, 1.0f));
+    PlayerInputComponent->BindAxis("MouseY", this, &AGroundCameraControllor::AddCameraPitchInput);
 
-void AGroundCameraControllor::OnKeyDownAction(FKey Key)
-{
-    if (Key == EKeys::SpaceBar)
-    {
-        this->Jump();
-    }
-    else if (Key == EKeys::LeftShift)
-    {
-        this->Sprint();
-    }
-}
+    //键盘轴事件 
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::W, 1.0f));
+    PlayerInputComponent->BindAxis("KeyForwardMove", this, &AGroundCameraControllor::AddForwardMovementInput);
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::S, -1.0f));
+    PlayerInputComponent->BindAxis("KeyForwardMove", this, &AGroundCameraControllor::AddForwardMovementInput);
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::A, -1.0f));
+    PlayerInputComponent->BindAxis("KeyRightMove", this, &AGroundCameraControllor::AddRightMovementInput);
+    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::D, 1.0f));
+    PlayerInputComponent->BindAxis("KeyRightMove", this, &AGroundCameraControllor::AddRightMovementInput);
 
-void AGroundCameraControllor::OnKeyAxisMove(FKey Key, float Axis)
-{
-    if (Key == EKeys::W || Key == EKeys::S)
-    {
-        this->AddForwardMovementInput(Axis);
-    }
-    if (Key == EKeys::A || Key == EKeys::D)
-    {
-        this->AddRightMovementInput(Axis);
-    }
-}
+    //键盘事件 
+    UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("LeftShift", EKeys::LeftShift));
+    PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &AGroundCameraControllor::Sprint);
+    UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("SpaceBar", EKeys::SpaceBar));
+    PlayerInputComponent->BindAction("SpaceBar", IE_Pressed, this, &AGroundCameraControllor::Jump);
 
-void AGroundCameraControllor::OnMouseXMove(float Axis)
-{
-    this->AddCameraYawInput(Axis);
-}
-
-void AGroundCameraControllor::OnMouseYMove(float Axis)
-{
-    this->AddCameraPitchInput(Axis);
+    PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &AGroundCameraControllor::StopSprint);
 }

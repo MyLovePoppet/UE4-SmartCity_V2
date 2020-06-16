@@ -126,6 +126,7 @@ public:
 
     /** Returns CustomMovement Component subobject **/
     virtual UPawnMovementComponent* GetMovementComponent() const override;
+    void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 
 protected:
@@ -141,10 +142,4 @@ protected:
     float RotationInterpSpeed;
 
     float MinVelocityToRotateMesh;
-
-    virtual void OnKeyUpAction(FKey Key) override;
-    virtual void OnKeyDownAction(FKey Key) override;
-    virtual void OnKeyAxisMove(FKey Key, float Axis) override;
-    virtual void OnMouseXMove(float Axis) override;
-    virtual void OnMouseYMove(float Axis) override;
 };

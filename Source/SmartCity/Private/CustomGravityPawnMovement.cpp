@@ -137,6 +137,11 @@ void UCustomGravityPawnMovement::ApplyControlInputToVelocity(float DeltaTime)
             if (!bIsInAir)
             {
                 const float DecelerationSpeed = FMath::Abs(Deceleration) * DeltaTime;
+                if (Velocity.SizeSquared() <= FMath::Square(DecelerationSpeed))
+                {
+                    Velocity = Velocity.ProjectOnToNormal(GetGravityDirection());
+                }
+                else
                 {
                     Velocity -= FVector::VectorPlaneProject(Velocity, GetGravityDirection()).GetSafeNormal() *
                         DecelerationSpeed;
