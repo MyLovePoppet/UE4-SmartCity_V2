@@ -39,8 +39,8 @@ void UCustomGravityPawnMovement::TickComponent(float DeltaTime, enum ELevelTick 
 
     UpdateCapsuleRotation(DeltaTime, -GetGravityDirection());
 
-    GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red,
-                                     bIsInAir ? TEXT("Air") : TEXT("Ground"));
+    //GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red,
+                                    // bIsInAir ? TEXT("Air") : TEXT("Ground"));
 
     /* Local Variables */
     const EDrawDebugTrace::Type DrawDebugType = EDrawDebugTrace::None;
@@ -102,7 +102,7 @@ void UCustomGravityPawnMovement::DoSprint()
 
 void UCustomGravityPawnMovement::DoStopSprint()
 {
-    GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red, "Stop");
+   // GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red, "Stop");
     MaxSpeed = LastWalkSpeed;
     bIsSprinting = false;
 }

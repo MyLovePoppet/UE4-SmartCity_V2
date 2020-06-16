@@ -17,6 +17,7 @@ class SMARTCITY_API ACameraControllorPawn : public APawn
 public:
     // Sets default values for this pawn's properties
     ACameraControllorPawn();
+    void Tick(float DeltaTime) override;
 
 protected:
     TSharedPtr<Camera> CameraState;
@@ -29,8 +30,8 @@ protected:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     UCameraComponent* CameraComponent;
 
-public:
     void UpdateCameraState();
+    float GetDepth(FVector2D cursor);
 
     Camera* GetCameraState();
     AActor* GetEarthActor();

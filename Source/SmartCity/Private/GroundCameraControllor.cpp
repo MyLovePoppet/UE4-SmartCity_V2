@@ -131,6 +131,10 @@ void AGroundCameraControllor::UpdateMeshRotation(float DeltaTime)
 
 void AGroundCameraControllor::Jump()
 {
+    FVector2D currentCursorPt;
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
+    float depth=GetDepth(currentCursorPt);
+    GEngine->AddOnScreenDebugMessage(0,1.0f,FColor::Green,FString::SanitizeFloat(depth));
     if (MovementComponent)
         MovementComponent->DoJump();
 }
