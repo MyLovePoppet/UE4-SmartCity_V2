@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CameraControllorPawn.h"
-
+#include "Containers/Queue.h"
 #include "FlyModeCameraControllor.generated.h"
 class AFlyModeCameraControllor;
 
@@ -54,6 +54,8 @@ protected:
     FVector GetHorizontalVector();
 
     void Zoom(float Speed);
+
+    void RotateByFVector(FVector centerToIntersectVec, FVector centerToNextIntersectVec);
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -61,18 +63,19 @@ public:
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    virtual void LeftButtonDown();
-    virtual void LeftButtonUp();
-    virtual void LeftButtonHold(float val);
+    void LeftButtonDown();
+    void LeftButtonUp();
+    void LeftButtonHold();
 
-    virtual void MidButtonDown();
-    virtual void MidButtonUp();
-    virtual void MidButtonHold(float val);
+    void MidButtonDown();
+    void MidButtonUp();
+    void MidButtonHold();
 
-    virtual void RightButtonDown();
-    virtual void RightButtonHold(float val);
+    void RightButtonDown();
+    void RightButtonUp();
+    void RightButtonHold();
 
-    virtual void OnScrollWheelUpPress(float val);
+    void OnScrollWheelUpPress(float val);
 private:
     FVector2D oldCursorPt;
     FVector2D currentCursorPt;
@@ -80,4 +83,21 @@ private:
     //中间旋转所绕轴
     FVector MidHoldAxis;
     FVector OldLocationOnEarth;
+
+
+    const uint32 frameSize = 20;
+    uint32 currentFrame = 0;
+    
+    bool isZooming = false;
+    float currentZoomVal;
+
+    bool isLeftButtonHold = false;
+    bool isMidButtonHold = false;
+    bool isRightButtonHold = false;
+
+    bool isRotating=false;
+    FVector currentLocation;
+    FVector positionLocation;
+    FVector deltaLocation;
+    FVector ShenZhenLocation;
 };

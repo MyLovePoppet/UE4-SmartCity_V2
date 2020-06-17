@@ -55,7 +55,8 @@ float ACameraControllorPawn::GetDepth(FVector2D cursor)
     //TArray<DepthPixel> mydata; //最终获取色深度值数据
     //FIntPoint buffsize; //深度长宽大小X和Y
     
-    FVector2D screenSize=FVector2D(1920,1080);
+    FVector2D screenSize;
+    GetWorld()->GetGameViewport()->GetViewportSize(screenSize);
     ENQUEUE_RENDER_COMMAND(ReadSurfaceFloatCommand)( // 将读取深度数据的命令推给渲染线程进行执行
         [&screenSize,&cursor, &depth](FRHICommandListImmediate& RHICmdList)
         //&cpuDataPtr, &mydata, &buffsize为传入的外部参数
@@ -65,21 +66,22 @@ float ACameraControllorPawn::GetDepth(FVector2D cursor)
             FIntPoint buffsize = uTex2DRes->GetSizeXY();
             uint32 sx = buffsize.X;
             uint32 sy = buffsize.Y;
-            
-            cursor.X=cursor.X*sx/screenSize.X;
-            cursor.Y=cursor.Y*sx/screenSize.Y;
-            
+            cursor.X=cursor.X/screenSize.X*sx;
+            cursor.Y=cursor.Y/screenSize.Y*sy;
             //mydata.AddUninitialized(sx * sy);
             uint32 Lolstrid = 0;
             void* cpuDataPtr = RHILockTexture2D(uTex2DRes, 0, RLM_ReadOnly, Lolstrid, true);
             DepthPixel *depthPixel=static_cast<DepthPixel*>(cpuDataPtr);
             // 加锁获取可读depth Texture深度值数组首地址
             //DepthPixel depthPixel;
-            depthPixel += static_cast<size_t>(sx * cursor.Y + cursor.X);
+            uint32 cursorX=cursor.X;
+            uint32 cursorY=cursor.Y;
+            depthPixel += static_cast<size_t>(sx * cursorY + cursorX);
             DepthPixel dep;
             memcpy(&dep,depthPixel,sizeof(DepthPixel));
             //memcpy(&depthPixel, cpuDataPtr, sizeof(DepthPixel)); //复制深度数据
             depth=dep.depth;
+            //GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Green,cursor.ToString());
             RHIUnlockTexture2D(uTex2DRes, 0, true); //解锁
             FSceneRenderTargets::Get(RHICmdList).AdjustGBufferRefCount(RHICmdList, -1);
         });

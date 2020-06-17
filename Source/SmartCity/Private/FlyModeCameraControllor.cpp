@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "FlyModeCameraControllor.h"
 
-#include <stack>
-
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerInput.h"
 #include "DrawDebugHelpers.h"
@@ -52,27 +50,6 @@ bool AFlyModeCameraControllor::LineSphereFirstIntersect(const FVector lineOri, c
         return true;
     }
     return false;
-    /* 得到玩家的camera方向和位置 *
-
-    const FVector TraceStart = lineOri;
-    const FVector Direction = lineDir;
-    float MaxUseDistance = (sphereOri - lineOri).Size();
-    //FMath::Sqrt((sphereOri - lineOri).SizeSquared() - radius * radius);
-    const FVector TraceEnd = TraceStart + (Direction * MaxUseDistance); //计算射线的终点  
-
-    //设置碰撞参数，Tag为一个字符串用于以后识别，true是TraceParams.bTraceComplex，this是InIgnoreActor  
-    FCollisionQueryParams TraceParams(FName(TEXT("TraceUsableActor")), true, this);
-    TraceParams.bReturnPhysicalMaterial = false;
-    //使用复杂Collision判定，逐面判定，更加准确  
-    TraceParams.bTraceComplex = true;
-
-    /* FHitResults负责接受结果 *
-    FHitResult Hit(ForceInit);
-    bool isHit = GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, TraceParams);
-    intersectPt = Hit.ImpactPoint;
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, isHit ? TEXT("TrueHit") : TEXT("FalseHit"));
-    return isHit;
-    */
 }
 
 // Sets default values
@@ -88,7 +65,10 @@ AFlyModeCameraControllor::AFlyModeCameraControllor()
 
     AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+    ShenZhenLocation=FVector(-238.32f,-540.11f,241.42f);
+    
     EarthActor = nullptr;
+    
 }
 
 //根据屏幕坐标获得对应的地球上3D坐标
@@ -144,17 +124,57 @@ void AFlyModeCameraControllor::BeginPlay()
     if (EarthActor)
     {
         EarthActor->GetRootComponent()->SetRelativeScale3D(InitScale3D);
-        CameraComponent->SetRelativeLocation(EarthActor->GetActorLocation() + FVector(2, 0, 0) * EarthRadius);
+        CameraComponent->SetRelativeLocation(EarthActor->GetActorLocation() + FVector(1.5, 0, 0) * EarthRadius);
         ArmLength = (CameraComponent->GetComponentLocation() - EarthActor->GetActorLocation()).Size();
     }
     CameraComponent->SetRelativeRotation(FVector(-1.5, 0, 0).Rotation());
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+
+    isRotating=true;
+    currentLocation=CameraComponent->GetRelativeLocation()-EarthActor->GetActorLocation();
+    positionLocation=ShenZhenLocation-EarthActor->GetActorLocation();
+    deltaLocation=(positionLocation-currentLocation)/frameSize;
 }
 
 // Called every frame
 void AFlyModeCameraControllor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (isZooming)
+    {
+        Zoom(currentZoomVal/frameSize);
+        currentFrame++;
+        if (currentFrame == frameSize)
+        {
+            isZooming = false;
+            currentFrame = 0;
+        }
+    }else if(isRotating)
+    {
+        RotateByFVector(currentLocation,positionLocation);
+        isRotating=false;
+        GEngine->AddOnScreenDebugMessage(-1,30.0f,FColor::White,currentLocation.ToString());
+        /*currentLocation+=deltaLocation;
+        GEngine->AddOnScreenDebugMessage(-1,30.0f,FColor::White,currentLocation.ToString());
+        currentFrame++;
+        if(currentFrame==frameSize)
+        {
+            isRotating=false;
+            currentFrame=0;
+        }*/
+    }
+    if(isLeftButtonHold)
+    {
+        LeftButtonHold();
+    }
+    if(isMidButtonHold)
+    {
+        MidButtonHold();
+    }
+    if(isRightButtonHold)
+    {
+        RightButtonHold();
+    }
 }
 
 // Called to bind functionality to input
@@ -166,7 +186,7 @@ void AFlyModeCameraControllor::SetupPlayerInputComponent(UInputComponent* Player
     UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseLeft", EKeys::LeftMouseButton, 1.0f));
     PlayerInputComponent->BindAction("MouseLeft", IE_Pressed, this, &AFlyModeCameraControllor::LeftButtonDown);
     PlayerInputComponent->BindAction("MouseLeft", IE_Released, this, &AFlyModeCameraControllor::LeftButtonUp);
-    PlayerInputComponent->BindAxis("MouseLeft", this, &AFlyModeCameraControllor::LeftButtonHold);
+    //PlayerInputComponent->BindAxis("MouseLeft", this, &AFlyModeCameraControllor::LeftButtonHold);
 
     //滚轮操作	
     UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("ScrollWheelUp", EKeys::MouseWheelAxis, 1.0f));
@@ -177,51 +197,144 @@ void AFlyModeCameraControllor::SetupPlayerInputComponent(UInputComponent* Player
     UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseMid", EKeys::MiddleMouseButton, 1.0f));
     PlayerInputComponent->BindAction("MouseMid", IE_Pressed, this, &AFlyModeCameraControllor::MidButtonDown);
     PlayerInputComponent->BindAction("MouseMid", IE_Released, this, &AFlyModeCameraControllor::MidButtonUp);
-    PlayerInputComponent->BindAxis("MouseMid", this, &AFlyModeCameraControllor::MidButtonHold);
+    //PlayerInputComponent->BindAxis("MouseMid", this, &AFlyModeCameraControllor::MidButtonHold);
 
     //鼠标右键
     UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("MouseRight", EKeys::RightMouseButton));
     UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseRight", EKeys::RightMouseButton, 1.0f));
     PlayerInputComponent->BindAction("MouseRight", IE_Pressed, this, &AFlyModeCameraControllor::RightButtonDown);
+    PlayerInputComponent->BindAction("MouseRight", IE_Released, this, &AFlyModeCameraControllor::RightButtonUp);
     //PlayerInputComponent->BindAction("MouseRight", IE_Released, this, &AFlyModeCameraControllor::RightButtonUp);
-    PlayerInputComponent->BindAxis("MouseRight", this, &AFlyModeCameraControllor::RightButtonHold);
+    //PlayerInputComponent->BindAxis("MouseRight", this, &AFlyModeCameraControllor::RightButtonHold);
 
-    //空格
-    //UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Space", EKeys::SpaceBar));
-    //PlayerInputComponent->BindAction("Space", IE_Pressed, this, &AFlyModeCameraControllor::SpaceScaleBall);
+    UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("SpaceBar", EKeys::SpaceBar));
+    PlayerInputComponent->BindAction("SpaceBar", IE_Pressed, this, &AFlyModeCameraControllor::RightButtonDown);
+    PlayerInputComponent->BindAction("SpaceBar", IE_Released, this, &AFlyModeCameraControllor::RightButtonDown);
+    
 }
 
 void AFlyModeCameraControllor::LeftButtonDown()
 {
+    FVector2D currentPt;
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(currentPt.X, currentPt.Y);
+    float depth = GetDepth(currentPt);
+    GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Green, FString::SanitizeFloat(depth));
     GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
+    isLeftButtonHold=true;
 }
 
 void AFlyModeCameraControllor::LeftButtonUp()
 {
+    isLeftButtonHold=false;
 }
 
-void AFlyModeCameraControllor::LeftButtonHold(float val)
+void AFlyModeCameraControllor::LeftButtonHold()
 {
-    if (FMath::Abs(val) > KINDA_SMALL_NUMBER)
-    {
-        GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
-        CalcDragRotation(oldCursorPt, currentCursorPt);
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
+    CalcDragRotation(oldCursorPt, currentCursorPt);
 
-        FVector inter;
-        CursorPointOnEarth(currentCursorPt, inter);
+    FVector inter;
+    CursorPointOnEarth(currentCursorPt, inter);
 
-        oldCursorPt = currentCursorPt;
-    }
+    oldCursorPt = currentCursorPt;
 }
 
+void AFlyModeCameraControllor::MidButtonDown()
+{
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
+    FVector intersectPt = FVector::ZeroVector;
 
+    //获取屏幕坐标对应的地球上3D坐标
+    CursorPointOnEarth(oldCursorPt, intersectPt);
+    OldLocationOnEarth = intersectPt;
+    MidHoldAxis = GetPointToCenterVector(intersectPt);
+
+    DrawDebugLine(GetWorld(), EarthActor->GetActorLocation(),
+                  EarthActor->GetActorLocation() - MidHoldAxis * EarthRadius * 1.5,
+                  FColor::Red, true, 20.f);
+    isMidButtonHold=true;
+}
+
+void AFlyModeCameraControllor::MidButtonUp()
+{
+    isMidButtonHold=false;
+}
+
+void AFlyModeCameraControllor::MidButtonHold()
+{
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
+    //鼠标的X坐标变化率转为度数。
+    uint32 SizeX = GEngine->GameViewport->Viewport->GetSizeXY().X;
+    float AngleDegX = (currentCursorPt.X - oldCursorPt.X) * 5.f / SizeX;
+    RotateEarthByAxis(AngleDegX);
+
+    //camer绕鼠标所指向地球上一点作垂面旋转。
+    uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
+    float AngleDegY = (currentCursorPt.Y - oldCursorPt.Y) * 3.f / SizeY;
+    FVector HorizontalVector = GetHorizontalVector();
+    FQuat DeltaQuat = FQuat(HorizontalVector, -AngleDegY);
+
+    //臂旋转
+    FVector TargetLocation = DeltaQuat.UnrotateVector(CameraComponent->GetComponentLocation() - OldLocationOnEarth);
+    TargetLocation += OldLocationOnEarth;
+    ArmLength = (TargetLocation - EarthActor->GetActorLocation()).Size();
+    if (ArmLength > EarthRadius + 50)
+    {
+        CameraComponent->SetRelativeLocation(TargetLocation);
+        //方向旋转
+        FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
+        CameraComponent->SetRelativeRotation(TargetQuat);
+    }
+    oldCursorPt = currentCursorPt;
+    UpdateCameraState();
+}
+
+void AFlyModeCameraControllor::RightButtonDown()
+{
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
+    isRightButtonHold=true;
+}
+
+void AFlyModeCameraControllor::RightButtonUp()
+{
+    isRightButtonHold=false;
+}
+
+void AFlyModeCameraControllor::RightButtonHold()
+{
+    
+    const uint32 SizeX = GEngine->GameViewport->Viewport->GetSizeXY().X;
+    const uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
+    GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
+    //x偏移
+    FVector intersectPt = FVector::ZeroVector;
+    //获取屏幕坐标对应的地球上3D坐标
+    CursorPointOnEarth(oldCursorPt, intersectPt);
+    MidHoldAxis = GetPointToCenterVector(intersectPt);
+    //DrawDebugLine(GetWorld(), EarthActor->GetActorLocation(), EarthActor->GetActorLocation() - MidHoldAxis * 7000,
+    //         FColor::Red, true, 20.f);
+
+    const float SpeedX = (currentCursorPt.X - oldCursorPt.X) / SizeY / 20.f;
+    RotateEarthByAxis(SpeedX);
+    //根据右键y偏移量得速率。
+    float SpeedY = (currentCursorPt.Y - oldCursorPt.Y) / SizeX;
+    //GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::White,FString::SanitizeFloat(SpeedY));
+    SpeedY=FMath::Clamp(SpeedY,-0.1f,0.1f);
+    Zoom(SpeedY);
+    UpdateCameraState();
+    
+}
 void AFlyModeCameraControllor::OnScrollWheelUpPress(float val)
 {
     if (FMath::Abs(val) > KINDA_SMALL_NUMBER)
     {
-        GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
-        Zoom(val);
-        UpdateCameraState();
+        if(!isZooming)
+        {
+            GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
+            currentZoomVal=val*1.5f;
+            isZooming=true;
+            currentFrame=0;
+        }
     }
     //GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green,FString::SanitizeFloat(val));
 }
@@ -229,6 +342,7 @@ void AFlyModeCameraControllor::OnScrollWheelUpPress(float val)
 //放大/缩小,速率由Speed控制。
 void AFlyModeCameraControllor::Zoom(const float Speed)
 {
+    GEngine->AddOnScreenDebugMessage(0,1.0f,FColor::Red,FString::SanitizeFloat(Speed));
     const FVector EarthLocation = EarthActor->GetActorLocation();
 
     if (ArmLength <= EarthRadius + 11.0f && Speed > 0)
@@ -276,58 +390,6 @@ void AFlyModeCameraControllor::Zoom(const float Speed)
 }
 
 
-void AFlyModeCameraControllor::MidButtonDown()
-{
-    GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
-    FVector intersectPt = FVector::ZeroVector;
-
-    //获取屏幕坐标对应的地球上3D坐标
-    CursorPointOnEarth(oldCursorPt, intersectPt);
-    OldLocationOnEarth = intersectPt;
-    MidHoldAxis = GetPointToCenterVector(intersectPt);
-
-    DrawDebugLine(GetWorld(), EarthActor->GetActorLocation(),
-                  EarthActor->GetActorLocation() - MidHoldAxis * EarthRadius * 1.5,
-                  FColor::Red, true, 20.f);
-
-    UpdateCameraState();
-}
-
-void AFlyModeCameraControllor::MidButtonUp()
-{
-}
-
-void AFlyModeCameraControllor::MidButtonHold(float val)
-{
-    if (FMath::Abs(val) > KINDA_SMALL_NUMBER)
-    {
-        GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
-        //鼠标的X坐标变化率转为度数。
-        uint32 SizeX = GEngine->GameViewport->Viewport->GetSizeXY().X;
-        float AngleDegX = (currentCursorPt.X - oldCursorPt.X) * 5.f / SizeX;
-        RotateEarthByAxis(AngleDegX);
-
-        //camer绕鼠标所指向地球上一点作垂面旋转。
-        uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
-        float AngleDegY = (currentCursorPt.Y - oldCursorPt.Y) * 3.f / SizeY;
-        FVector HorizontalVector = GetHorizontalVector();
-        FQuat DeltaQuat = FQuat(HorizontalVector, -AngleDegY);
-
-        //臂旋转
-        FVector TargetLocation = DeltaQuat.UnrotateVector(CameraComponent->GetComponentLocation() - OldLocationOnEarth);
-        TargetLocation += OldLocationOnEarth;
-        ArmLength = (TargetLocation - EarthActor->GetActorLocation()).Size();
-        if (ArmLength > EarthRadius + 50)
-        {
-            CameraComponent->SetRelativeLocation(TargetLocation);
-            //方向旋转
-            FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
-            CameraComponent->SetRelativeRotation(TargetQuat);
-        }
-        oldCursorPt = currentCursorPt;
-        UpdateCameraState();
-    }
-}
 
 FVector AFlyModeCameraControllor::GetHorizontalVector()
 {
@@ -340,35 +402,6 @@ FVector AFlyModeCameraControllor::GetHorizontalVector()
     return (Left3D - Right3D).GetSafeNormal();
 }
 
-void AFlyModeCameraControllor::RightButtonDown()
-{
-    GetWorld()->GetFirstPlayerController()->GetMousePosition(oldCursorPt.X, oldCursorPt.Y);
-}
-
-
-void AFlyModeCameraControllor::RightButtonHold(float val)
-{
-    if (FMath::Abs(val) > KINDA_SMALL_NUMBER)
-    {
-        const uint32 SizeX = GEngine->GameViewport->Viewport->GetSizeXY().X;
-        const uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
-        GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
-        //x偏移
-        FVector intersectPt = FVector::ZeroVector;
-        //获取屏幕坐标对应的地球上3D坐标
-        CursorPointOnEarth(oldCursorPt, intersectPt);
-        MidHoldAxis = GetPointToCenterVector(intersectPt);
-        //DrawDebugLine(GetWorld(), EarthActor->GetActorLocation(), EarthActor->GetActorLocation() - MidHoldAxis * 7000,
-        //         FColor::Red, true, 20.f);
-
-        const float SpeedX = (currentCursorPt.X - oldCursorPt.X) / SizeY / 20.f;
-        RotateEarthByAxis(SpeedX);
-        //根据右键y偏移量得速率。
-        const float SpeedY = (currentCursorPt.Y - oldCursorPt.Y) / SizeX;
-        Zoom(SpeedY);
-        UpdateCameraState();
-    }
-}
 
 //点到地心方向
 FVector AFlyModeCameraControllor::GetPointToCenterVector(FVector TouchPoint)
@@ -404,7 +437,7 @@ void AFlyModeCameraControllor::RotateEarthByAxis(float AngleDeg)
     CameraComponent->SetRelativeRotation(Target);
 }
 
-void AFlyModeCameraControllor::ScaleBall(float Sign)
+void AFlyModeCameraControllor::ScaleBall(float Rate)
 {
     float DistanceRate = ArmLength / EarthRadius;
     //缩放倍率随相机地球距离比线性改变，
@@ -439,4 +472,19 @@ void AFlyModeCameraControllor::ScaleBall(float Sign)
                                      TEXT("NowScale:") + FString::SanitizeFloat(NowScale * InitScale));
     GEngine->AddOnScreenDebugMessage(1, 50.f, FColor::Red,TEXT("DistRate:") + FString::SanitizeFloat(DistanceRate));
     GEngine->AddOnScreenDebugMessage(2, 50.f, FColor::Green,TEXT("EarthRadius:") + FString::SanitizeFloat(EarthRadius));
+}
+void AFlyModeCameraControllor::RotateByFVector(FVector centerToIntersectVec, FVector centerToNextIntersectVec)
+{
+    centerToIntersectVec=centerToIntersectVec.GetSafeNormal();
+    centerToNextIntersectVec=centerToNextIntersectVec.GetSafeNormal();
+    FVector EarthLocation=EarthActor->GetActorLocation();
+    //求角度差
+    FQuat DeltaQuat = FQuat::FindBetweenNormals(centerToIntersectVec, centerToNextIntersectVec);
+    //旋转臂
+    FVector TargetLocation = DeltaQuat.UnrotateVector(
+        CameraComponent->GetComponentLocation() - EarthLocation);
+    CameraComponent->SetRelativeLocation(TargetLocation + EarthLocation);
+    //旋转角度
+    FQuat TargetQuat = DeltaQuat.Inverse() * CameraComponent->GetRelativeRotation().Quaternion();
+    CameraComponent->SetRelativeRotation(TargetQuat);
 }
