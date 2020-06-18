@@ -9,6 +9,15 @@
 
 #include "CameraControllorPawn.generated.h"
 
+struct DepthPixel //定义深度像素结构体
+{
+    float depth;
+    char stencil;
+    char unused1;
+    char unused2;
+    char unused3;
+};
+
 UCLASS()
 class SMARTCITY_API ACameraControllorPawn : public APawn
 {
@@ -31,7 +40,9 @@ protected:
     UCameraComponent* CameraComponent;
 
     void UpdateCameraState();
-    float GetDepth(FVector2D cursor);
+    bool ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos);
+    float DepthOnScreen(FVector2D TargetPoint);
+    TArray<DepthPixel> GetDepthSurface(FVector2D& OutRenderTargetSize);
 
     Camera* GetCameraState();
     AActor* GetEarthActor();

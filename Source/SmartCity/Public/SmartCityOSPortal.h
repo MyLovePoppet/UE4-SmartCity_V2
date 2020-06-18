@@ -2,11 +2,18 @@
 
 #pragma once
 
+#include "CameraControllorPawn.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "EventGenerateAdapter.h"
 #include "SmartCityOSPortal.generated.h"
 
+UENUM()
+enum class EnumCameraMode :uint8
+{
+    EnumCameraModeFly,
+    EnumCameraModeFlyTo,
+    EnumCameraModeGround
+};
 UCLASS()
 class SMARTCITY_API ASmartCityOSPortal : public AActor
 {
@@ -26,5 +33,8 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    AEventGenerateAdapter* GlobeEventGA;
+    EnumCameraMode CameraMode;
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    ACameraControllorPawn* CameraControllor;
 };
+// Fill out your copyright notice in the Description page of Project Settings.

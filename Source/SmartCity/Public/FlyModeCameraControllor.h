@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "CameraControllorPawn.h"
-#include "Containers/Queue.h"
 #include "FlyModeCameraControllor.generated.h"
 class AFlyModeCameraControllor;
 
@@ -74,6 +73,8 @@ public:
     void RightButtonDown();
     void RightButtonUp();
     void RightButtonHold();
+    void OnSpaceBarDown();
+    void OnEnterDown();
 
     void OnScrollWheelUpPress(float val);
 private:
@@ -83,21 +84,29 @@ private:
     //中间旋转所绕轴
     FVector MidHoldAxis;
     FVector OldLocationOnEarth;
-
-
-    const uint32 frameSize = 20;
-    uint32 currentFrame = 0;
-    
-    bool isZooming = false;
-    float currentZoomVal;
-
+    //放入到Tick内执行
     bool isLeftButtonHold = false;
     bool isMidButtonHold = false;
     bool isRightButtonHold = false;
 
+    //缩放插值所需要的变量
+    const uint32 zoomFrameSize = 20;
+    uint32 currentFrame = 0;
+    bool isZooming = false;
+    float currentZoomVal;
+
+    //旋转插值所需要的变量
+    const uint32 rotateFrameSize = 120;
     bool isRotating=false;
     FVector currentLocation;
     FVector positionLocation;
     FVector deltaLocation;
     FVector ShenZhenLocation;
+
+    //回到正北正南插值所需要的变量
+    const uint32 resetFrameSize = 20;
+    bool isReseting=false;
+    FRotator currentResetRotation;
+    FRotator deltaResetRotation;
+    FRotator positionResetRotation;
 };
