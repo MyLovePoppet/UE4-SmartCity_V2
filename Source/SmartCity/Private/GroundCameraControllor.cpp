@@ -23,19 +23,6 @@ AGroundCameraControllor::AGroundCameraControllor(): Super()
         CapsuleComponent->SetNotifyRigidBodyCollision(true);
     }
 
-    /*if (SpringArm)
-    {
-        SpringArm->AddRelativeLocation(FVector(0.f, 0.f, 64.f));
-        SpringArm->TargetArmLength = 10.0f;
-        SpringArm->bDoCollisionTest = true;
-        SpringArm->ProbeSize = 15.0f;
-        SpringArm->ProbeChannel = ECollisionChannel::ECC_Camera;
-        SpringArm->bUsePawnControlRotation = false;
-        SpringArm->bInheritPitch = true;
-        SpringArm->bInheritYaw = true;
-        SpringArm->bInheritRoll = true;
-        SpringArm->SetupAttachment(CapsuleComponent);
-    }*/
 
     if (CameraComponent)
     {
@@ -79,6 +66,7 @@ void AGroundCameraControllor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::White, MovementComponent->IsFalling() ? "Air" : "Ground");
     //UpdateMeshRotation(DeltaTime);
 
     //    RootComponent->SetWorldRotation(FRotationMatrix::MakeFromXZ(CurrentForwardDirection, GetActorUpVector()).Rotator());
@@ -91,12 +79,10 @@ void AGroundCameraControllor::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 {
     Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-    if (MovementComponent == NULL)
+    if (MovementComponent)
     {
-        return;
+        MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
     }
-
-    MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }
 
 // Called when the game starts or when spawned
@@ -104,30 +90,11 @@ void AGroundCameraControllor::BeginPlay()
 {
     Super::BeginPlay();
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
-}
-
-/*
-void AGroundCameraControllor::UpdateMeshRotation(float DeltaTime)
-{
-    
-    const float Speed = MovementComponent != NULL ? MovementComponent->Velocity.Size() : 0.0f;
-
-    if (Speed < MinVelocityToRotateMesh)//&&bRotateMeshOnlyWhenMoving
+    if (MovementComponent)
     {
-        return;
+        MovementComponent->setPlanetActor(EarthActor);
     }
-
-    FRotator MeshRotation = GetMesh()->GetRelativeRotation();
-    const FVector ProjectedVelocity = FVector::VectorPlaneProject(GetMovementComponent()->Velocity, GetActorUpVector());
-    const FRotator Rot = FRotationMatrix::MakeFromXZ(GetTransform().InverseTransformVector(ProjectedVelocity), GetActorUpVector()).Rotator();
-
-    MeshRotation.Yaw = 
-        MeshStartRotation.Yaw + Rot.Yaw;
-
-    GetMesh()->SetRelativeRotation( MeshRotation);// , MeshRotation, DeltaTime, RotationInterpSpeed);
-    
 }
-*/
 
 void AGroundCameraControllor::Jump()
 {
@@ -161,7 +128,7 @@ void AGroundCameraControllor::setPlanetActor(AActor* Planet)
 
 void AGroundCameraControllor::AddForwardMovementInput(float ScaleValue)
 {
-    if (MovementComponent == NULL) { return; }
+    if (MovementComponent == nullptr) { return; }
 
     const FVector UpDirection = GetActorUpVector();
     const FVector CameraForward = CameraComponent->GetForwardVector();

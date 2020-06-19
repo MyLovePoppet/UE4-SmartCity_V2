@@ -27,15 +27,19 @@ public:
     // Sets default values for this pawn's properties
     ACameraControllorPawn();
     void Tick(float DeltaTime) override;
-
+    void Init(AActor* EarthActor);
 protected:
     TSharedPtr<Camera> CameraState;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     AActor* EarthActor;
+public:
+    AActor* GetEarthActor() const { return EarthActor; }
+
+    void SetEarthActor(AActor* _EarthActor);
+
+protected:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float EarthRadius;
-    //UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    //USpringArmComponent* SpringArm;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     UCameraComponent* CameraComponent;
 
@@ -47,12 +51,9 @@ protected:
     Camera* GetCameraState();
     AActor* GetEarthActor();
     float GetEarthRadius();
-    //USpringArmComponent* GetSpringArm();
     UCameraComponent* GetCameraComponent();
 
     void SetCameraState(Camera* _Camera);
-    void SetEarthActor(AActor* _EarthActor);
     void SetEarthRadius(float _EarthRadius);
-    //void SetSpringArm(USpringArmComponent* _SpringArm);
     void SetCameraComponent(UCameraComponent* _CameraComponent);
 };

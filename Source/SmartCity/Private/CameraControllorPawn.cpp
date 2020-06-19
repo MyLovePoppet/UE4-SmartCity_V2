@@ -22,7 +22,10 @@ void ACameraControllorPawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 }
-
+void ACameraControllorPawn::Init(AActor* _EarthActor)
+{
+    this->SetEarthActor(_EarthActor);
+}
 /**
  *还有一个ViewProJectionMatrix没实现,此函数放在tick内进行更新
  */
@@ -37,6 +40,9 @@ void ACameraControllorPawn::UpdateCameraState()
     this->CameraState->SetUpDirection(CameraComponent->GetUpVector());
     //this->CameraState->SetViewProjectionMatrix()
 }
+/**
+ *
+ */
 bool ACameraControllorPawn::ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos)
 {
     float ScreenSpaceDepth = DepthOnScreen(ScreenPos);

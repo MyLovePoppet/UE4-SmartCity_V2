@@ -21,7 +21,6 @@ public:
     // Sets default values for this pawn's properties
     AFlyModeCameraControllor();
 
-
     //后续缩放比例
     float NowScale = 1.f;
     //初始缩放，后续的缩放都会乘以该缩放。
@@ -55,12 +54,15 @@ protected:
     void Zoom(float Speed);
 
     void RotateByFVector(FVector centerToIntersectVec, FVector centerToNextIntersectVec);
+
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    float GetHeight() const { return ArmLength - EarthRadius; }
 
     void LeftButtonDown();
     void LeftButtonUp();
@@ -97,7 +99,7 @@ private:
 
     //旋转插值所需要的变量
     const uint32 rotateFrameSize = 120;
-    bool isRotating=false;
+    bool isRotating = false;
     FVector currentLocation;
     FVector positionLocation;
     FVector deltaLocation;
@@ -105,7 +107,7 @@ private:
 
     //回到正北正南插值所需要的变量
     const uint32 resetFrameSize = 20;
-    bool isReseting=false;
+    bool isReseting = false;
     FRotator currentResetRotation;
     FRotator deltaResetRotation;
     FRotator positionResetRotation;
