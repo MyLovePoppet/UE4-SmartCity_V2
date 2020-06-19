@@ -15,7 +15,9 @@ ACubeCollisionTestActor::ACubeCollisionTestActor()
 void ACubeCollisionTestActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CubeStaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	UStaticMesh *CubeStaticMesh=CubeStaticMeshComponent->GetStaticMesh();
+	//CubeStaticMeshComponent->SetCollisionProfileName()
 }
 
 // Called every frame

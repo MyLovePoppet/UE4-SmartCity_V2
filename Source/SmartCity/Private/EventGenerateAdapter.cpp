@@ -3,10 +3,6 @@
 
 #include "EventGenerateAdapter.h"
 
-#include "FlyModeCameraControllor.h"
-#include "FlyToCameraControllor.h"
-#include "GroundCameraControllor.h"
-
 // Sets default values
 AEventGenerateAdapter::AEventGenerateAdapter()
 {

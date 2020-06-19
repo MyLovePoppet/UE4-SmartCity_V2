@@ -23,19 +23,6 @@ AGroundCameraControllor::AGroundCameraControllor(): Super()
         CapsuleComponent->SetNotifyRigidBodyCollision(true);
     }
 
-    /*if (SpringArm)
-    {
-        SpringArm->AddRelativeLocation(FVector(0.f, 0.f, 64.f));
-        SpringArm->TargetArmLength = 10.0f;
-        SpringArm->bDoCollisionTest = true;
-        SpringArm->ProbeSize = 15.0f;
-        SpringArm->ProbeChannel = ECollisionChannel::ECC_Camera;
-        SpringArm->bUsePawnControlRotation = false;
-        SpringArm->bInheritPitch = true;
-        SpringArm->bInheritYaw = true;
-        SpringArm->bInheritRoll = true;
-        SpringArm->SetupAttachment(CapsuleComponent);
-    }*/
 
     if (CameraComponent)
     {
@@ -79,6 +66,7 @@ void AGroundCameraControllor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    GEngine->AddOnScreenDebugMessage(0,1.0f,FColor::White,MovementComponent->IsFalling()?"Air":"Ground");
     //UpdateMeshRotation(DeltaTime);
 
     //    RootComponent->SetWorldRotation(FRotationMatrix::MakeFromXZ(CurrentForwardDirection, GetActorUpVector()).Rotator());
@@ -95,7 +83,7 @@ void AGroundCameraControllor::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
     {
         return;
     }
-
+    MovementComponent->bIsInAir=false;
     MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }
 

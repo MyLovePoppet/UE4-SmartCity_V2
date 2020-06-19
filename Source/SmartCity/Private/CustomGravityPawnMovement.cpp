@@ -52,8 +52,8 @@ void UCustomGravityPawnMovement::TickComponent(float DeltaTime, enum ELevelTick 
     FHitResult HitResult;
     TArray<AActor*> ActorsToIgnore;
     UKismetSystemLibrary::SphereTraceSingle(this, TraceStart, TraceEnd, ShapeRadius,
-                                            UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true,
-                                            ActorsToIgnore, DrawDebugType, HitResult, true);
+                                        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true,
+                                        ActorsToIgnore, DrawDebugType, HitResult, true);
     bIsInAir = !HitResult.bBlockingHit;
     TimeInAir = bIsInAir ? TimeInAir + DeltaTime : 0.0f;
 }
