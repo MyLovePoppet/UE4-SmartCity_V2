@@ -99,7 +99,7 @@ public:
         ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
     float AirControlRatio;
 
-    bool bIsInAir;
+    //bool bIsInAir;
     
 private:
 

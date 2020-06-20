@@ -15,8 +15,9 @@ AGridCollisionTestActor::AGridCollisionTestActor()
 void AGridCollisionTestActor::BeginPlay()
 {
 	Super::BeginPlay();
-	GridStaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	bool c =GridStaticMeshComponent->SupportsDefaultCollision();
+	GridStaticMeshComponent->SetRelativeLocation(FVector(-296830.f,-5635620.f,-2975810.f));
+	//设置为将复杂碰撞用于简单碰撞
+	GridStaticMeshComponent->GetStaticMesh()->BodySetup->CollisionTraceFlag=ECollisionTraceFlag::CTF_UseComplexAsSimple;
 }
 
 // Called every frame
