@@ -81,7 +81,8 @@ void AGroundCameraControllor::NotifyHit(UPrimitiveComponent* MyComp, AActor* Oth
 
     if (MovementComponent)
     {
-        MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+        MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse,
+                                        Hit);
     }
 }
 

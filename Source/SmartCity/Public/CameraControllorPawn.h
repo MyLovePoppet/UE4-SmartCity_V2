@@ -44,9 +44,8 @@ protected:
     UCameraComponent* CameraComponent;
 
     void UpdateCameraState();
-    bool ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos);
-    float DepthOnScreen(FVector2D TargetPoint);
-    TArray<DepthPixel> GetDepthSurface(FVector2D& OutRenderTargetSize);
+    bool ViewPortToWorldSafety(FVector2D ScreenPos, FVector& out_WorldPos);
+
 
     Camera* GetCameraState();
     AActor* GetEarthActor();
@@ -56,4 +55,9 @@ protected:
     void SetCameraState(Camera* _Camera);
     void SetEarthRadius(float _EarthRadius);
     void SetCameraComponent(UCameraComponent* _CameraComponent);
+
+private:
+    bool ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos);
+    float DepthOnScreen(FVector2D TargetPoint);
+    TArray<DepthPixel> GetDepthSurface(FVector2D& OutRenderTargetSize);
 };

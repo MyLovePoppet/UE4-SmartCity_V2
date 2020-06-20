@@ -40,6 +40,19 @@ void ACameraControllorPawn::UpdateCameraState()
     this->CameraState->SetUpDirection(CameraComponent->GetUpVector());
     //this->CameraState->SetViewProjectionMatrix()
 }
+
+/**
+ * \brief 安全地获取屏幕点所对应世界坐标，避免点击到地球外而使得距离过远
+ * \param ScreenPos 鼠标的屏幕坐标
+ * \param out_WorldPos 返回的世界坐标
+ * \return True：能够获取对应世界坐标且世界坐标到地心距离小于1.414*EarthRadius;否则为False
+ */
+bool ACameraControllorPawn::ViewPortToWorldSafety(FVector2D ScreenPos, FVector& out_WorldPos)
+{
+    const bool bSuccess = ViewPortToWorld(ScreenPos, out_WorldPos);
+    const bool bAboveSurface =  (out_WorldPos - EarthActor->GetActorLocation()).SizeSquared() - 2 * EarthRadius * EarthRadius < 0;
+    return bSuccess && bAboveSurface;
+}
 /**
  *
  */

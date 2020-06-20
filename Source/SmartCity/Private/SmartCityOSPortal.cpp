@@ -16,6 +16,7 @@ void ASmartCityOSPortal::BeginPlay()
     Super::BeginPlay();
     ChangeCameraMode(this->CameraMode);
 }
+
 //改变相机模式
 void ASmartCityOSPortal::SetCameraMode(EnumCameraMode NewCameraMode)
 {
@@ -57,8 +58,8 @@ void ASmartCityOSPortal::ChangeCameraMode(EnumCameraMode NewCameraMode)
             break;
         }
         // case EnumCameraMode::EnumCameraModeFlyTo: break;
-        default:
-            return;
+    default:
+        return;
     }
     if (NewControllor != nullptr)
     {
