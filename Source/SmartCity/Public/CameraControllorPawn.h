@@ -27,32 +27,37 @@ public:
     // Sets default values for this pawn's properties
     ACameraControllorPawn();
     void Tick(float DeltaTime) override;
-
+    void Init(AActor* EarthActor);
 protected:
     TSharedPtr<Camera> CameraState;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     AActor* EarthActor;
+public:
+    AActor* GetEarthActor() const { return EarthActor; }
+
+    void SetEarthActor(AActor* _EarthActor);
+
+protected:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     float EarthRadius;
-    //UPROPERTY(EditAnywhere,BlueprintReadWrite)
-    //USpringArmComponent* SpringArm;
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     UCameraComponent* CameraComponent;
 
     void UpdateCameraState();
-    bool ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos);
-    float DepthOnScreen(FVector2D TargetPoint);
-    TArray<DepthPixel> GetDepthSurface(FVector2D& OutRenderTargetSize);
+    bool ViewPortToWorldSafety(FVector2D ScreenPos, FVector& out_WorldPos);
+
 
     Camera* GetCameraState();
     AActor* GetEarthActor();
     float GetEarthRadius();
-    //USpringArmComponent* GetSpringArm();
     UCameraComponent* GetCameraComponent();
 
     void SetCameraState(Camera* _Camera);
-    void SetEarthActor(AActor* _EarthActor);
     void SetEarthRadius(float _EarthRadius);
-    //void SetSpringArm(USpringArmComponent* _SpringArm);
     void SetCameraComponent(UCameraComponent* _CameraComponent);
+
+private:
+    bool ViewPortToWorld(FVector2D ScreenPos, FVector& outWorldPos);
+    float DepthOnScreen(FVector2D TargetPoint);
+    TArray<DepthPixel> GetDepthSurface(FVector2D& OutRenderTargetSize);
 };

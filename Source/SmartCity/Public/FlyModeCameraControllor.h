@@ -16,11 +16,10 @@ class SMARTCITY_API AFlyModeCameraControllor : public ACameraControllorPawn
     GENERATED_BODY()
 
 public:
-    bool LineSphereFirstIntersect(FVector lineOri, FVector lineDir, FVector sphereOri, float radius,
-                                  FVector& intersectPt);
+    bool LineSphereFirstIntersect(const FVector LineOri, const FVector LineDir, const FVector SphereOri,
+                                  FVector& out_IntersectPt);
     // Sets default values for this pawn's properties
     AFlyModeCameraControllor();
-
 
     //后续缩放比例
     float NowScale = 1.f;
@@ -39,9 +38,15 @@ protected:
     UPROPERTY(Category = "Custom Pawn", EditAnywhere)
     float ArmLength;
 
+    //需要满足鼠标点击不同海拔高度的拖拽同步
+    //引入虚拟半径的概念，虚拟半径为”鼠标点击点“到”地心“的距离
+    //应用与 bool LineSphereFirstIntersect
+    //默认等于地球半径
+    float VirtualRadius;
+
     bool ScreenCursorInfoToWorld(const FVector2D screenCursorPt, FVector& WorldPt, FVector& WorldDir);
 
-    void CalcDragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
+    void DragRotation(const FVector2D inCursorPt, const FVector2D inNextCursorPt);
 
     bool CursorPointOnEarth(FVector2D CursorPoint, FVector& intersectPt);
 
@@ -55,12 +60,15 @@ protected:
     void Zoom(float Speed);
 
     void RotateByFVector(FVector centerToIntersectVec, FVector centerToNextIntersectVec);
+
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    float GetHeight() const { return ArmLength - EarthRadius; }
 
     void LeftButtonDown();
     void LeftButtonUp();
@@ -84,6 +92,7 @@ private:
     //中间旋转所绕轴
     FVector MidHoldAxis;
     FVector OldLocationOnEarth;
+    
     //放入到Tick内执行
     bool isLeftButtonHold = false;
     bool isMidButtonHold = false;
@@ -97,7 +106,7 @@ private:
 
     //旋转插值所需要的变量
     const uint32 rotateFrameSize = 120;
-    bool isRotating=false;
+    bool isRotating = false;
     FVector currentLocation;
     FVector positionLocation;
     FVector deltaLocation;
@@ -105,7 +114,7 @@ private:
 
     //回到正北正南插值所需要的变量
     const uint32 resetFrameSize = 20;
-    bool isReseting=false;
+    bool isReseting = false;
     FRotator currentResetRotation;
     FRotator deltaResetRotation;
     FRotator positionResetRotation;
