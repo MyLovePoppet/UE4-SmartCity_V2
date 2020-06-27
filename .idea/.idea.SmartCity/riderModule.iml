@@ -172,6 +172,7 @@
     <content url="file://C:/UnrealEngine/Engine/Plugins/Media/MfMedia" />
     <content url="file://C:/UnrealEngine/Engine/Plugins/Media/PixelStreaming" />
     <content url="file://C:/UnrealEngine/Engine/Plugins/Media/TimecodeSynchronizer" />
+    <content url="file://C:/UnrealEngine/Engine/Plugins/Media/VlcMedia-master" />
     <content url="file://C:/UnrealEngine/Engine/Plugins/Media/WebMMedia" />
     <content url="file://C:/UnrealEngine/Engine/Plugins/Media/WmfMedia" />
     <content url="file://C:/UnrealEngine/Engine/Plugins/MeshPainting" />

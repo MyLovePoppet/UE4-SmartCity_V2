@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{E5A43E88-4193-D748-21CA-308D11A32ED5}",
+	"EngineAssociation": "{76E2EBA4-45AB-F7BD-BA95-6F9F1A25E455}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"MediaAssets"
 			]
 		}
 	]
