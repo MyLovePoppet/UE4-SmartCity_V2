@@ -34,7 +34,7 @@ FTexture2DRHIRef RGBToRHITexture(TArray<FColor> ColorArray, FVector2D OutputDim)
                 for (uint32 Col = 0; Col < OutputDim.X; ++Col)
                 {
                     //RGB数据写入
-                    FColor Color = ColorArray[Row * OutputDim.Y + Col];
+                    FColor Color = ColorArray[Row * OutputDim.X + Col];
                     uint8 r = Color.R;
                     uint8 g = Color.G;
                     uint8 b = Color.B;
