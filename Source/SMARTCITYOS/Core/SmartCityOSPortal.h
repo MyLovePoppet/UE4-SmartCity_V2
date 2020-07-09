@@ -28,13 +28,15 @@ public:
     FlyModeCameraControllor* FlyModeCache;
     GroundModeCameraControllor* GroundModeCache;
     //将EarthLocation设置深圳
-    FVector EarthLocation = FVector(2414524.75, 5373941, -2435787.25);
+    FVector EarthLocation = FVector(0.f,0.f,0.f);
 
     //定义UE相机
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* UECamera;
     //UPROPERTY(VisibleAnywhere)
     AInputPawn* UserInput;
+
+    //AActor *UdpReceiverActor;
 
 public:
     // Sets default values for this actor's properties

@@ -221,50 +221,50 @@ void AInputPawn::MouseY(float value)
 // Called to bind functionality to input
 void AInputPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-    TArray<FKey> ActionKeys = {EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven,EKeys::LeftShift,EKeys::LeftControl,EKeys::LeftAlt,
-    EKeys::LeftMouseButton,EKeys::MiddleMouseButton,EKeys::RightMouseButton};
-    for (FKey key : ActionKeys)
-    {
-        UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping(key.GetFName(), key));
-        PlayerInputComponent->BindAction(key.GetFName(), IE_Released, this, &AInputPawn::ReleasedAction);
-        PlayerInputComponent->BindAction(key.GetFName(), IE_Pressed, this, &AInputPawn::PressedAction);
-    }
-
-    //鼠标左键	
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseLeft", EKeys::LeftMouseButton, 1.0f));
-    PlayerInputComponent->BindAxis("MouseLeft", this, &AInputPawn::MouseLMove);
-
-    //滚轮操作
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("ScrollWheelUp", EKeys::MouseWheelAxis, 1.0f));
-    PlayerInputComponent->BindAxis("ScrollWheelUp", this, &AInputPawn::ScrollWheel);
-
-    //鼠标中键轴
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseMid", EKeys::MiddleMouseButton, 1.0f));
-    PlayerInputComponent->BindAxis("MouseMid", this, &AInputPawn::MouseMMove);
-
-    //鼠标右键轴
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseRight", EKeys::RightMouseButton, 1.0f));
-    PlayerInputComponent->BindAxis("MouseRight", this, &AInputPawn::MouseRMove);
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    ///以下为Ground模式的按键绑定
-    //鼠标移动
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseX", EKeys::MouseX, 1.0f));
-    PlayerInputComponent->BindAxis("MouseX", this, &AInputPawn::MouseX); //AddCameraYawInput);
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseY", EKeys::MouseY, 1.0f));
-    PlayerInputComponent->BindAxis("MouseY", this, &AInputPawn::MouseY); //AddCameraPitchInput);
-
-    //键盘轴事件 
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::W, 1.0f));
-    PlayerInputComponent->BindAxis("KeyForwardMove", this, &AInputPawn::WAxis);
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::S, -1.0f));
-    PlayerInputComponent->BindAxis("KeyForwardMove", this, &AInputPawn::WAxis);
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::A, -1.0f));
-    PlayerInputComponent->BindAxis("KeyRightMove", this, &AInputPawn::DAxis);
-    UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::D, 1.0f));
-    PlayerInputComponent->BindAxis("KeyRightMove", this, &AInputPawn::DAxis);
+    // Super::SetupPlayerInputComponent(PlayerInputComponent);
+    // TArray<FKey> ActionKeys = {EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven,EKeys::LeftShift,EKeys::LeftControl,EKeys::LeftAlt,
+    // EKeys::LeftMouseButton,EKeys::MiddleMouseButton,EKeys::RightMouseButton};
+    // for (FKey key : ActionKeys)
+    // {
+    //     UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping(key.GetFName(), key));
+    //     PlayerInputComponent->BindAction(key.GetFName(), IE_Released, this, &AInputPawn::ReleasedAction);
+    //     PlayerInputComponent->BindAction(key.GetFName(), IE_Pressed, this, &AInputPawn::PressedAction);
+    // }
+    //
+    // //鼠标左键	
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseLeft", EKeys::LeftMouseButton, 1.0f));
+    // PlayerInputComponent->BindAxis("MouseLeft", this, &AInputPawn::MouseLMove);
+    //
+    // //滚轮操作
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("ScrollWheelUp", EKeys::MouseWheelAxis, 1.0f));
+    // PlayerInputComponent->BindAxis("ScrollWheelUp", this, &AInputPawn::ScrollWheel);
+    //
+    // //鼠标中键轴
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseMid", EKeys::MiddleMouseButton, 1.0f));
+    // PlayerInputComponent->BindAxis("MouseMid", this, &AInputPawn::MouseMMove);
+    //
+    // //鼠标右键轴
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseRight", EKeys::RightMouseButton, 1.0f));
+    // PlayerInputComponent->BindAxis("MouseRight", this, &AInputPawn::MouseRMove);
+    //
+    //
+    // ////////////////////////////////////////////////////////////////////////////////////////////////
+    // ///以下为Ground模式的按键绑定
+    // //鼠标移动
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseX", EKeys::MouseX, 1.0f));
+    // PlayerInputComponent->BindAxis("MouseX", this, &AInputPawn::MouseX); //AddCameraYawInput);
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseY", EKeys::MouseY, 1.0f));
+    // PlayerInputComponent->BindAxis("MouseY", this, &AInputPawn::MouseY); //AddCameraPitchInput);
+    //
+    // //键盘轴事件 
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::W, 1.0f));
+    // PlayerInputComponent->BindAxis("KeyForwardMove", this, &AInputPawn::WAxis);
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyForwardMove", EKeys::S, -1.0f));
+    // PlayerInputComponent->BindAxis("KeyForwardMove", this, &AInputPawn::WAxis);
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::A, -1.0f));
+    // PlayerInputComponent->BindAxis("KeyRightMove", this, &AInputPawn::DAxis);
+    // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("KeyRightMove", EKeys::D, 1.0f));
+    // PlayerInputComponent->BindAxis("KeyRightMove", this, &AInputPawn::DAxis);
 }
 
 void AInputPawn::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
