@@ -6,25 +6,23 @@
 #include "UdpServerInfo.h"
 #include "GameFramework/Actor.h"
 #include "Networking/Public/Networking.h"
-#include "UDPServer.generated.h"
+#include "UdpServerBase.generated.h"
 
 UCLASS()
-class SMARTCITYOS_API AUDPServer : public AActor
+class SMARTCITYOS_API AUdpServerBase : public AActor
 {
     GENERATED_BODY()
-
+protected:
     FSocket* Socket;
     FUdpSocketReceiver* UdpSocketReceiver;
 
     FVector2D LastRotatePosition;
-public:
     static FVector2D PhoneScreenSize;
     static FVector2D PCScreenSize;
-    static TMap<FString,EOperationType>OperationMap;
+    static TMap<FString, EOperationType> OperationMap;
     // Sets default values for this actor's properties
-    AUDPServer();
+    AUdpServerBase();
 
-protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
@@ -37,17 +35,11 @@ public:
                           bool& success); // 接收器初始化  接收信息前
 
     void DataRecv(FString& str, bool& success);
-
-    void Handle(const TSharedPtr<FJsonObject>& JsonObject);
-
     static bool GetJsonObjectFromJsonFString(const FString& _jsonFString, TSharedPtr<FJsonObject>& _jsonObject);
 
     static EOperationType ToEnumType(const FString& Str);
     static FVector2D ToPCLocation(FVector2D PhoneLocation);
     static void InitOperationMap();
+protected:
+    virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject);
 };
-
-inline EOperationType AUDPServer::ToEnumType(const FString& Str)
-{
-    return OperationMap[Str.ToUpper()];
-}

@@ -221,7 +221,7 @@ void AInputPawn::MouseY(float value)
 // Called to bind functionality to input
 void AInputPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    // Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
     // TArray<FKey> ActionKeys = {EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven,EKeys::LeftShift,EKeys::LeftControl,EKeys::LeftAlt,
     // EKeys::LeftMouseButton,EKeys::MiddleMouseButton,EKeys::RightMouseButton};
     // for (FKey key : ActionKeys)

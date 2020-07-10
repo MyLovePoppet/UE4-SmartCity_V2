@@ -73,7 +73,8 @@ public:
 private:
     FVector2D oldCursorPt;
     FVector2D currentCursorPt;
-
+    FVector2D oldMidCursorPt;
+    FVector2D currentMidCursorPt;
     //中间旋转所绕轴
     FVector MidHoldAxis;
     FVector OldLocationOnEarth;

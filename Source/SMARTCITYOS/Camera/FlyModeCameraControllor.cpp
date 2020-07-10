@@ -158,9 +158,9 @@ void FlyModeCameraControllor::OnMouseLMove(FVector2D position, float value)
 
 void FlyModeCameraControllor::OnMouseMidButtonDown(FVector2D position)
 {
-    oldCursorPt = position;
+    oldMidCursorPt = position;
     FVector WorldPos = FVector::ZeroVector;
-    if (ViewPortToWorldSafety(oldCursorPt, WorldPos))
+    if (ViewPortToWorldSafety(oldMidCursorPt, WorldPos))
     {
         VirtualRadius = (WorldPos - EarthLocation).Size();
         //获取屏幕坐标对应的地球上3D坐标
@@ -180,29 +180,29 @@ void FlyModeCameraControllor::OnMouseMMove(FVector2D position, float value)
 {
     if (isMidButtonHold)
     {
-        currentCursorPt = position;
+        currentMidCursorPt = position;
         //X轴:鼠标的X坐标变化率转为度数。
         uint32 SizeX = GEngine->GameViewport->Viewport->GetSizeXY().X;
-        float AngleDegX = (currentCursorPt.X - oldCursorPt.X) * 5.f / SizeX;
+        float AngleDegX = (currentMidCursorPt.X - oldMidCursorPt.X) * 5.f / SizeX;
         RotateEarthByAxis(AngleDegX);
 
         //Y轴:camer绕鼠标所指向地球上一点作垂面旋转。
-        uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
-        float AngleDegY = (currentCursorPt.Y - oldCursorPt.Y) * 3.f / SizeY;
-        FVector HorizontalVector = GetHorizontalVector();
-        FQuat DeltaQuat = FQuat(HorizontalVector, -AngleDegY);
-        //臂旋转
-        FVector TargetLocation = DeltaQuat.UnrotateVector(CameraState->GetLocation() - OldLocationOnEarth);
-        TargetLocation += OldLocationOnEarth;
-        ArmLength = (TargetLocation - EarthLocation).Size();
-        if (ArmLength > OriginRadius + 50)
-        {
-            CameraState->SetLocation(TargetLocation);
-            //方向旋转
-            FQuat TargetQuat = DeltaQuat.Inverse() * CameraState->GetRotation().Quaternion();
-            CameraState->SetRotation(TargetQuat);
-        }
-        oldCursorPt = currentCursorPt;
+        // uint32 SizeY = GEngine->GameViewport->Viewport->GetSizeXY().Y;
+        // float AngleDegY = (currentCursorPt.Y - oldCursorPt.Y) * 3.f / SizeY;
+        // FVector HorizontalVector = GetHorizontalVector();
+        // FQuat DeltaQuat = FQuat(HorizontalVector, -AngleDegY);
+        // //臂旋转
+        // FVector TargetLocation = DeltaQuat.UnrotateVector(CameraState->GetLocation() - OldLocationOnEarth);
+        // TargetLocation += OldLocationOnEarth;
+        // ArmLength = (TargetLocation - EarthLocation).Size();
+        // if (ArmLength > OriginRadius + 50)
+        // {
+        //     CameraState->SetLocation(TargetLocation);
+        //     //方向旋转
+        //     FQuat TargetQuat = DeltaQuat.Inverse() * CameraState->GetRotation().Quaternion();
+        //     CameraState->SetRotation(TargetQuat);
+        // }
+        oldMidCursorPt = currentMidCursorPt;
     }
 }
 
