@@ -18,16 +18,27 @@ void ADragUdpServer::BeginPlay()
 
 void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 {
+    Super::Handle(JsonObject);
     FString Type;
     if (JsonObject->TryGetStringField("type", Type))
     {
-        switch (ToEnumType(Type))
+        switch (UdpServerUtilities::ToEnumType(Type))
         {
+        case EOperationType::FLY_MODE_DRAG:
+            {
+                float X = JsonObject->GetNumberField("coordinateX");
+                float Y = JsonObject->GetNumberField("coordinateY");
+                for (auto& IInputBase : AInputPawn::inputListeners)
+                {
+                    IInputBase->OnMouseLMove(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), 1.0f);
+                }
+                break;
+            }
         case EOperationType::FLY_MODE_START:
             {
                 float X = JsonObject->GetNumberField("coordinateX");
                 float Y = JsonObject->GetNumberField("coordinateY");
-                FVector2D PCLocation = ToPCLocation(FVector2D(X, Y));
+                FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
                 //按下三个鼠标按键
                 for (auto& IIputBase : AInputPawn::inputListeners)
                 {
@@ -36,16 +47,6 @@ void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                     IIputBase->OnMouseRButtonDown(PCLocation);
                 }
                 LastRotatePosition = PCLocation;
-                break;
-            }
-        case EOperationType::FLY_MODE_DRAG:
-            {
-                float X = JsonObject->GetNumberField("coordinateX");
-                float Y = JsonObject->GetNumberField("coordinateY");
-                for (auto& IInputBase : AInputPawn::inputListeners)
-                {
-                    IInputBase->OnMouseLMove(ToPCLocation(FVector2D(X, Y)), 1.0f);
-                }
                 break;
             }
         default:

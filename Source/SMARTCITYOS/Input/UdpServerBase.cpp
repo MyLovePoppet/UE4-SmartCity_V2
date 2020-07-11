@@ -8,18 +8,15 @@
 
 #include "InputPawn.h"
 
-FVector2D AUdpServerBase::PhoneScreenSize = FVector2D(2244.0f, 1080.f);
-FVector2D AUdpServerBase::PCScreenSize = FVector2D(1920.0f, 980.f);
-TMap<FString,EOperationType> AUdpServerBase::OperationMap=TMap<FString,EOperationType>();
 
 // Sets default values
 AUdpServerBase::AUdpServerBase()
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    if (OperationMap.Num() == 0)
+    if (UdpServerUtilities::OperationMap.Num() == 0)
     {
-        InitOperationMap();
+        UdpServerUtilities::InitOperationMap();
     }
 }
 
@@ -63,9 +60,9 @@ void AUdpServerBase::Tick(float DeltaTime)
     DataRecv(JsonStr, isSuccess);
     if (isSuccess)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);  
+        GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);
         TSharedPtr<FJsonObject> JsonObject;
-        if (GetJsonObjectFromJsonFString(JsonStr, JsonObject))
+        if (UdpServerUtilities::GetJsonObjectFromJsonFString(JsonStr, JsonObject))
         {
             Handle(JsonObject);
         }
@@ -73,7 +70,7 @@ void AUdpServerBase::Tick(float DeltaTime)
 }
 
 void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort,
-                                  bool& success)
+                                      bool& success)
 {
     TSharedRef<FInternetAddr> targetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     FIPv4Address Addr;
@@ -83,7 +80,7 @@ void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const
     //FIPv4Endpoint Endpoint(Addr, ThePort);                 //指定ip地址
     Socket = FUdpSocketBuilder(*YourChosenSocketName)
              .AsNonBlocking()
-             .AsReusable()    
+             .AsReusable()
              .BoundToEndpoint(Endpoint)
              .WithReceiveBufferSize(2 * 1024 * 1024);
     //BUFFER SIZE
@@ -139,48 +136,15 @@ void AUdpServerBase::DataRecv(FString& str, bool& success)
     //return success;
 }
 
-//读取Json字符串
-bool AUdpServerBase::GetJsonObjectFromJsonFString(const FString& _jsonFString, TSharedPtr<FJsonObject>& _jsonObject)
-{
-    if (!_jsonFString.IsEmpty())
-    {
-        TSharedRef<TJsonReader<>> t_reader = TJsonReaderFactory<>::Create(_jsonFString);
-        return FJsonSerializer::Deserialize(t_reader, _jsonObject);
-    }
-    return false;
-}
-
-EOperationType AUdpServerBase::ToEnumType(const FString& Str)
-{
-    return OperationMap[Str.ToUpper()];
-}
-
-FVector2D AUdpServerBase::ToPCLocation(FVector2D PhoneLocation)
-{
-    float X = FMath::Clamp(PhoneLocation.X / PhoneScreenSize.X * PCScreenSize.X, 0.f, PCScreenSize.X);
-    float Y = FMath::Clamp(PhoneLocation.Y / PhoneScreenSize.Y * PCScreenSize.Y, 0.f, PCScreenSize.Y);
-    return FVector2D(X, Y);
-}
-
-void AUdpServerBase::InitOperationMap()
-{
-    OperationMap.Add(TEXT("FLY_MODE_START"), EOperationType::FLY_MODE_START);
-    OperationMap.Add(TEXT("FLY_MODE_DRAG"), EOperationType::FLY_MODE_DRAG);
-    OperationMap.Add(TEXT("FLY_MODE_SCALE"), EOperationType::FLY_MODE_SCALE);
-    OperationMap.Add(TEXT("FLY_MODE_ROTATE"), EOperationType::FLY_MODE_ROTATE);
-
-    OperationMap.Add(TEXT("GROUND_MODE_MOVE"), EOperationType::GROUND_MODE_MOVE);
-
-    OperationMap.Add(TEXT("GROUND_MODE_JUMP"), EOperationType::GROUND_MODE_JUMP);
-    OperationMap.Add(TEXT("GROUND_MODE_START_SPRINT"), EOperationType::GROUND_MODE_START_SPRINT);
-    OperationMap.Add(TEXT("GROUND_MODE_STOP_SPRINT"), EOperationType::GROUND_MODE_STOP_SPRINT);
-
-    OperationMap.Add(TEXT("GROUND_MODE_CAMERA_MOVE"), EOperationType::GROUND_MODE_CAMERA_MOVE);
-}
-
 void AUdpServerBase::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 {
-    
+    //测试发送UDP发送函数
+    FString Str;
+    if (UdpServerUtilities::GetFStringInJsonFormat(JsonObject, Str))
+    {
+        if (UdpServerUtilities::SendDataWithUdp(Str))
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red,TEXT("Send str back!"));
+        }
+    }
 }
-
-

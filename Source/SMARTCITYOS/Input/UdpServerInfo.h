@@ -15,7 +15,7 @@ enum class EOperationType:unsigned char
 
     //地面模式
     GROUND_MODE_MOVE,
-    //移动    {type:"GROUND_MODE_MOVE_W",VeticalAxis:0.6,HorizontalAxis:0.8}        //axis为-1~1之间的值，操纵杆为单位圆，返回x值和y值即可 在按住不放或者是改变位置时发送数据
+    //移动    {type:"GROUND_MODE_MOVE",VeticalAxis:0.6,HorizontalAxis:0.8}        //axis为-1~1之间的值，操纵杆为单位圆，返回x值和y值即可 在按住不放或者是改变位置时发送数据
 
     GROUND_MODE_JUMP,
     //跳跃            {type:"GROUND_MODE_JUMP"}
@@ -34,4 +34,16 @@ namespace EOperationPort
     //拖拽
     const size_t FLY_MODE_SCALE = 9097;
     const size_t FLY_MODE_ROTATE = 9096;
+    const size_t SEND_BACK_PORT = 9077;
+}
+
+namespace PhonePCScreenSize
+{
+    const FVector2D PhoneScreenSize = FVector2D(2244.0f, 1080.f);
+    const FVector2D PCScreenSize = FVector2D(1920.0f, 980.f);
+}
+
+namespace SendBackMessage
+{
+    const FString MESSAGE_CHANGE_TO_GROUND_MODE = TEXT("{type=\"CHANGE_TO_GROUND_MODE\"}");
 }

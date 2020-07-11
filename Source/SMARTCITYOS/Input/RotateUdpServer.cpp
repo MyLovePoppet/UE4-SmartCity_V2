@@ -21,13 +21,28 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
     FString Type;
     if (JsonObject->TryGetStringField("type", Type))
     {
-        switch (ToEnumType(Type))
+        switch (UdpServerUtilities::ToEnumType(Type))
         {
+        case EOperationType::FLY_MODE_ROTATE:
+            {
+                float RotateAngle = JsonObject->GetNumberField("degree");
+                for (auto& IInputBase : AInputPawn::inputListeners)
+                {
+                    //转化为移动的数据
+                    RotateAngle = FMath::Clamp(RotateAngle, -5.f, 5.f);
+                    float XOffset = RotateAngle / 180.0f * PhonePCScreenSize::PCScreenSize.X;
+                    FVector2D CurrentLocation = LastRotatePosition + FVector2D(XOffset, 0.f);
+                    IInputBase->OnMouseMMove(CurrentLocation, 1.0f);
+                    LastRotatePosition = CurrentLocation;
+                }
+                break;
+            }
+
         case EOperationType::FLY_MODE_START:
             {
                 float X = JsonObject->GetNumberField("coordinateX");
                 float Y = JsonObject->GetNumberField("coordinateY");
-                FVector2D PCLocation = ToPCLocation(FVector2D(X, Y));
+                FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
                 //按下三个鼠标按键
                 for (auto& IIputBase : AInputPawn::inputListeners)
                 {
@@ -39,21 +54,6 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 break;
             }
 
-        case EOperationType::FLY_MODE_ROTATE:
-            {
-                float RotateAngle = JsonObject->GetNumberField("degree");
-                for (auto& IInputBase : AInputPawn::inputListeners)
-                {
-                    //转化为移动的数据
-                    RotateAngle=FMath::Clamp(RotateAngle,-5.f,5.f);
-                    float XOffset=RotateAngle/180.0f*PCScreenSize.X;
-                    FVector2D CurrentLocation=LastRotatePosition+FVector2D(XOffset,0.f);
-                    IInputBase->OnMouseMMove(CurrentLocation,1.0f);
-                    LastRotatePosition=CurrentLocation;
-                }
-                break;
-            }
-            
         default:
             break;
         }

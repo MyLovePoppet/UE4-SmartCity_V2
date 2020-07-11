@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UdpServerInfo.h"
 #include "GameFramework/Actor.h"
-#include "Networking/Public/Networking.h"
+#include "UdpServerUtilities.h"
 #include "UdpServerBase.generated.h"
 
 UCLASS()
@@ -17,9 +16,7 @@ protected:
     FUdpSocketReceiver* UdpSocketReceiver;
 
     FVector2D LastRotatePosition;
-    static FVector2D PhoneScreenSize;
-    static FVector2D PCScreenSize;
-    static TMap<FString, EOperationType> OperationMap;
+
     // Sets default values for this actor's properties
     AUdpServerBase();
 
@@ -35,11 +32,6 @@ public:
                           bool& success); // 接收器初始化  接收信息前
 
     void DataRecv(FString& str, bool& success);
-    static bool GetJsonObjectFromJsonFString(const FString& _jsonFString, TSharedPtr<FJsonObject>& _jsonObject);
-
-    static EOperationType ToEnumType(const FString& Str);
-    static FVector2D ToPCLocation(FVector2D PhoneLocation);
-    static void InitOperationMap();
 protected:
     virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject);
 };
