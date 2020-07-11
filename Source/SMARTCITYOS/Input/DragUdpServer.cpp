@@ -18,7 +18,7 @@ void ADragUdpServer::BeginPlay()
 
 void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 {
-    Super::Handle(JsonObject);
+    //Super::Handle(JsonObject);
     FString Type;
     if (JsonObject->TryGetStringField("type", Type))
     {

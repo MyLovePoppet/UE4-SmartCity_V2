@@ -3,6 +3,8 @@
 
 #include "SmartCityOSPortal.h"
 
+#include "SMARTCITYOS/Input/UdpServerUtilities.h"
+
 
 extern SMARTCITYOS_API class Synchronize GSynchronize;
 
@@ -151,6 +153,7 @@ void ASmartCityOSPortal::ChangeControllorMod()
             Synchronize::UpdateActorLocation();
             Synchronize::SynchronizeCameraToUE();
             SCOSCameraControllor = GroundModeCache;
+            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND);
         }
     }
     else if (SCOSCameraControllor == GroundModeCache)

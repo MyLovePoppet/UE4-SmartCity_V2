@@ -45,5 +45,6 @@ namespace PhonePCScreenSize
 
 namespace SendBackMessage
 {
-    const FString MESSAGE_CHANGE_TO_GROUND_MODE = TEXT("{type=\"CHANGE_TO_GROUND_MODE\"}");
+    const FString MESSAGE_MODE_CHANGE_TO_GROUND = TEXT("{type=\"MODE_CHANGE_TO_GROUND\"}");
+    const FString MESSAGE_MODE_CHANGE_TO_FLY = TEXT("{type=\"MODE_CHANGE_TO_FLY\"}");
 }
