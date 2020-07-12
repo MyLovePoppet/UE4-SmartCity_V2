@@ -34,6 +34,8 @@ namespace EOperationPort
     //拖拽
     const size_t FLY_MODE_SCALE = 9097;
     const size_t FLY_MODE_ROTATE = 9096;
+    const size_t GROUND_MODE = 9095;
+    //const size_t GROUND_MODE_CAMERA = 9094;
     const size_t SEND_BACK_PORT = 9077;
 }
 

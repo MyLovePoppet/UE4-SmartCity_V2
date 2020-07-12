@@ -46,7 +46,7 @@ void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                     IIputBase->OnMouseMidButtonDown(PCLocation);
                     IIputBase->OnMouseRButtonDown(PCLocation);
                 }
-                LastRotatePosition = PCLocation;
+                //LastRotatePosition = PCLocation;
                 break;
             }
         default:

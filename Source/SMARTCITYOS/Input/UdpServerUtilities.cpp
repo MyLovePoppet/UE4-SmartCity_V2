@@ -2,6 +2,8 @@
 
 
 #include "UdpServerUtilities.h"
+
+#include "UdpServerInfo.h"
 TMap<FString, EOperationType> UdpServerUtilities::OperationMap = TMap<FString, EOperationType>();
 
 //读取Json字符串
@@ -22,10 +24,10 @@ EOperationType UdpServerUtilities::ToEnumType(const FString& Str)
 
 FVector2D UdpServerUtilities::ToPCLocation(FVector2D PhoneLocation)
 {
-    float X = FMath::Clamp(PhoneLocation.X / PhonePCScreenSize::PhoneScreenSize.X * PhonePCScreenSize::PCScreenSize.X,
-                           0.f, PhonePCScreenSize::PCScreenSize.X);
-    float Y = FMath::Clamp(PhoneLocation.Y / PhonePCScreenSize::PhoneScreenSize.Y * PhonePCScreenSize::PCScreenSize.Y,
-                           0.f, PhonePCScreenSize::PCScreenSize.Y);
+    float X = FMath::SmoothStep(0, PhonePCScreenSize::PhoneScreenSize.X, PhoneLocation.X) *
+        PhonePCScreenSize::PCScreenSize.X;
+    float Y = FMath::SmoothStep(0, PhonePCScreenSize::PhoneScreenSize.Y, PhoneLocation.Y) *
+        PhonePCScreenSize::PCScreenSize.Y;
     return FVector2D(X, Y);
 }
 

@@ -9,10 +9,10 @@ void ARotateUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("DragUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_ROTATE, isSuccess);
+    StartUDPReceiver("RotateUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_ROTATE, isSuccess);
     if (!isSuccess)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Init falied!");
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Rotate server Init falied!");
     }
 }
 
@@ -47,6 +47,7 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 for (auto& IIputBase : AInputPawn::inputListeners)
                 {
                     IIputBase->OnMouseLButtonDown(PCLocation);
+                    //IIputBase->OnMouseLButtonUp(PCLocation);
                     IIputBase->OnMouseMidButtonDown(PCLocation);
                     IIputBase->OnMouseRButtonDown(PCLocation);
                 }

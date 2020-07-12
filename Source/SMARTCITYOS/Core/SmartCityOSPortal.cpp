@@ -153,7 +153,15 @@ void ASmartCityOSPortal::ChangeControllorMod()
             Synchronize::UpdateActorLocation();
             Synchronize::SynchronizeCameraToUE();
             SCOSCameraControllor = GroundModeCache;
-            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND);
+            //转为地面模式
+            //UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND);
+            // for (auto& IIputBase : AInputPawn::inputListeners)
+            // {
+            //     IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);
+            //     IIputBase->OnMouseMidButtonUp(FVector2D::ZeroVector);
+            //     IIputBase->OnMouseRButtonUp(FVector2D::ZeroVector);
+            // }
+            
         }
     }
     else if (SCOSCameraControllor == GroundModeCache)
