@@ -89,6 +89,7 @@ bool UdpServerUtilities::SendDataWithUdp(const FString& Message, const FString& 
     //ScreenMsg("UDP Send Succcess! INFO Sent = ", ToSend);
     SenderSocket->Close();
     ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(SenderSocket);
+    GEngine->AddOnScreenDebugMessage(-1,100.f,FColor::Red,"Send"+Message);
     return true;
 }
 
