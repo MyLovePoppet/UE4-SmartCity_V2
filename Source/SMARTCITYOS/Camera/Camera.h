@@ -18,14 +18,13 @@ private:
     float FOV;
     FVector Location;
     FRotator Rotation;
-	FRotator RelativeRotation; 
+	FRotator RelativeRotation;
     FVector UpDirection;
     float AspectRatio;
     FVector2D ScreenResolution;
     bool IsPerspectView;
     FMatrix ViewProjectionMatrix;
 	float NearClipPlane;
-	FVector CameraForward;
 	FVector CameraRight;
 
 	FVector EarthLocation;
@@ -34,7 +33,7 @@ public:
     float GetFOV() const;
     FVector GetLocation() const;
 	FRotator GetRotation() const;
-	FRotator GetRelativeRotation() const; 
+	FRotator GetRelativeRotation() const;
     FVector GetUpDirection() const;
     float GetAspectRatio() const;
     FVector2D GetScreenResolution() const;
@@ -44,16 +43,15 @@ public:
 	float GetCameraHeight();
 	float GetNearClipPlane();
 	FVector GetCameraRight() const;
-	FVector GetCameraForward() const;
 
 	FIntPoint GetScreenResolutionIntPoint() const;
 
 public:
     void SetFOV(float _FOV);
     void SetLocation(FVector _Location);
-    void SetRotation(FRotator _Rotation);
+	void SetRotation(FRotator _Rotation);
+	void SetRelativeRotation(FRotator _RelativeRotation);
 	void SetRotation(FQuat _Rotation);
-	void SetRelativeRotation(FRotator _RelativeRotation); 
     void SetUpDirection(FVector _UpDirection);
     void SetAspectRatio(float _AspectRatio);
     void SetScreenResolution(FVector2D _ScreenResolution);
@@ -62,7 +60,8 @@ public:
 	void SetNearClipPlane(float _NearClipPlane);
 
 	void SetCameraRight(const FVector& _CameraRight);
-	void SetCameraForward(const FVector& _CameraForward);
 
 	void SetEarthLocation(FVector _EarthLocation);
+
+	Camera* CameraTransform(FMatrix InMatrix);
 };

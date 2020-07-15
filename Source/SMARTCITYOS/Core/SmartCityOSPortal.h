@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Kismet/GameplayStatics.h"
 #include "Synchronize.h"
 #include "..\Input\InputPawn.h"
 #include "..\Camera\CameraControllor.h"
 #include "..\Camera\FlyModeCameraControllor.h"
 #include "..\Camera\GroundModeCameraControllor.h"
+
 #include "SmartCityOSPortal.generated.h"
 
 
@@ -28,15 +28,13 @@ public:
     FlyModeCameraControllor* FlyModeCache;
     GroundModeCameraControllor* GroundModeCache;
     //将EarthLocation设置深圳
-    FVector EarthLocation = FVector(0.f,0.f,0.f);
+    FVector EarthLocation = FVector(2414524.75, 5373941, -2435787.25);
 
     //定义UE相机
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* UECamera;
     //UPROPERTY(VisibleAnywhere)
     AInputPawn* UserInput;
-
-    //AActor *UdpReceiverActor;
 
 public:
     // Sets default values for this actor's properties

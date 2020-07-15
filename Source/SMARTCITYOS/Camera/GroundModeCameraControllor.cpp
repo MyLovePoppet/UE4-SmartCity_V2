@@ -35,11 +35,13 @@ void GroundModeCameraControllor::Stop()
 
 void GroundModeCameraControllor::AddForwardMovementInput(float ScaleValue) const
 {
+	const FVector RightDirection = CameraState->GetCameraRight();
     const FVector UpDirection = BodyState->GetUpDirection();
-    const FVector CameraForward = CameraState->GetCameraForward();
-    const float Dot = FVector::DotProduct(UpDirection, CameraForward);
+	FQuat RightToForward = FQuat(UpDirection, -3.14159 / 2);
+	const FVector CameraForward = RightToForward.RotateVector(RightDirection);
+    //const float Dot = FVector::DotProduct(UpDirection, CameraForward);
 
-    if (FMath::Abs(Dot) < 1 - SMALL_NUMBER)
+    //if (FMath::Abs(Dot) < 1 - SMALL_NUMBER)
     {
         FVector CurrentForwardDirection = FVector::VectorPlaneProject(CameraForward, UpDirection);
         TPair<FVector, float> CurrentForward(CurrentForwardDirection, ScaleValue);
@@ -52,8 +54,8 @@ void GroundModeCameraControllor::AddRightMovementInput(float ScaleValue) const
 {
     const FVector UpDirection = BodyState->GetUpDirection();
     const FVector CameraRight = CameraState->GetCameraRight();
-    const float Dot = FVector::DotProduct(UpDirection, CameraRight);
-    if (FMath::Abs(Dot) < 1 - SMALL_NUMBER)
+    //const float Dot = FVector::DotProduct(UpDirection, CameraRight);
+    //if (FMath::Abs(Dot) < 1 - SMALL_NUMBER)
     {
         FVector CurrentRightDirection = FVector::VectorPlaneProject(CameraRight, UpDirection);
         TPair<FVector, float> CurrentRight(CurrentRightDirection, ScaleValue);
@@ -64,18 +66,18 @@ void GroundModeCameraControllor::AddRightMovementInput(float ScaleValue) const
 
 void GroundModeCameraControllor::AddCameraPitchInput(float ScaleValue) const
 {
-    FRotator CameraRelativeRot = CameraState->GetRelativeRotation(); 
+    FRotator CameraRelativeRot = CameraState->GetRelativeRotation();
     const float CameraNewPitch = FMath::ClampAngle(CameraRelativeRot.Pitch + ScaleValue, -89.f,
                                                    89.f);
     CameraRelativeRot.Pitch = CameraNewPitch;
-    CameraState->SetRelativeRotation(CameraRelativeRot); 
+    CameraState->SetRelativeRotation(CameraRelativeRot);
 }
 
 void GroundModeCameraControllor::AddCameraYawInput(float ScaleValue) const
 {
-    FRotator CameraRelativeRot = CameraState->GetRelativeRotation(); 
+    FRotator CameraRelativeRot = CameraState->GetRelativeRotation();
     CameraRelativeRot.Yaw += ScaleValue;
-    CameraState->SetRelativeRotation(CameraRelativeRot); 
+    CameraState->SetRelativeRotation(CameraRelativeRot);
 }
 
 void GroundModeCameraControllor::DoJump() const
@@ -128,6 +130,7 @@ void GroundModeCameraControllor::MouseY(float value)
 
 void GroundModeCameraControllor::WAxis(float value)
 {
+
     AddForwardMovementInput(value);
 }
 

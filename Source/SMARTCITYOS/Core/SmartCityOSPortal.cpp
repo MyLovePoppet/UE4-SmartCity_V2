@@ -27,8 +27,6 @@ void ASmartCityOSPortal::BeginPlay()
 
     //初始化CameraState,用于判断视点是否发生变化
     CameraState = SCOSCameraControllor->CameraState;
-
-    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 }
 
 //void ASmartCityOSPortal::PostInitializeComponents() {
@@ -54,14 +52,11 @@ void ASmartCityOSPortal::Tick(float DeltaTime)
     }
     else if (SCOSCameraControllor == GroundModeCache)
     {
-        Synchronize::SynchronizeCameraToUE();
-        Synchronize::SynchronizeCameraToSCOS();
         Synchronize::GroundModeUpdate();
     }
     //在Tick中判断CameraState是否发生改变，若改变则执行
     Camera NewCameraState = *CameraState;
 
-    //控制大气层是否显示
     ChangeControllorMod();
 }
 
@@ -120,8 +115,10 @@ void ASmartCityOSPortal::GenerateCamera()
     GroundModeCache->Stop();
     SCOSCameraControllor = FlyModeCache;
     SCOSCameraControllor->Restart();
-
+    
     Synchronize::SynchronizeCameraToUE();
+
+    //new FlyToCameraControllor();
 }
 
 bool ASmartCityOSPortal::IsCameraStateChanged(const Camera& InLastCameraState, const Camera& NewCameraState)
@@ -154,13 +151,13 @@ void ASmartCityOSPortal::ChangeControllorMod()
             Synchronize::SynchronizeCameraToUE();
             SCOSCameraControllor = GroundModeCache;
             //转为地面模式
-            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.196"));
-             for (auto& IIputBase : AInputPawn::inputListeners)
-             {
-                 IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);
-                 IIputBase->OnMouseMidButtonUp(FVector2D::ZeroVector);
-                 IIputBase->OnMouseRButtonUp(FVector2D::ZeroVector);
-             }
+            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.152"));
+            // for (auto& IIputBase : AInputPawn::inputListeners)
+            // {
+            //     IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);
+            //     IIputBase->OnMouseMidButtonUp(FVector2D::ZeroVector);
+            //     IIputBase->OnMouseRButtonUp(FVector2D::ZeroVector);
+            // }
             
         }
     }

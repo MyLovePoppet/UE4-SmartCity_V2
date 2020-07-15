@@ -16,33 +16,32 @@
 class SMARTCITYOS_API Synchronize
 {
 public:
-	Synchronize();
-	~Synchronize();
+    Synchronize();
+    ~Synchronize();
 
 public:
- 	//定义UEMap对象
-	static AActor* MapActor;
- 	//定义Camera对象(OS内)
-	static Camera* CameraState;
-	//Ground模式的身体姿态信息
-	static GroundBody* BodyState;
- 	//定义UE相机
- 	static UCameraComponent* UECamera;
+    //����UEMap����
+    static AActor* MapActor;
+    //����Camera����(OS��)
+    static Camera* CameraState;
+    //Groundģʽ��������̬��Ϣ
+    static GroundBody* BodyState;
+    //����UE���
+    static UCameraComponent* UECamera;
 
-	static AInputPawn* UserInput;
+    static AInputPawn* UserInput;
 
- public:
- 	//将camera同步到UE
- 	static void SynchronizeCameraToUE();
- 	//将UEcamera同步到SCOS
- 	static void SynchronizeCameraToSCOS();
+public:
+    //��cameraͬ����UE
+    static void SynchronizeCameraToUE();
+    //��UEcameraͬ����SCOS
+    static void SynchronizeCameraToSCOS();
 
-	static void SynchronizeGroundToUE();
+    static void SynchronizeGroundToUE();
 
-	static void SynchronizeGroundToSCOS();
-	//强制更新actor的位置，一般只在切换CameraMode时调用
-	static void UpdateActorLocation();
+    static void SynchronizeGroundToSCOS();
+    //ǿ�Ƹ���actor��λ�ã�һ��ֻ���л�CameraModeʱ����
+    static void UpdateActorLocation();
 
-	static void GroundModeUpdate();
-	
+    static void GroundModeUpdate();
 };

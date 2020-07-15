@@ -116,7 +116,7 @@ void UCustomGravityPawnMovement::CapsuleHited(class UPrimitiveComponent* MyComp,
     //     SizeSquared());
 
     //碰撞后将垂直碰撞面的速度置零
-    Velocity = FVector::VectorPlaneProject(Velocity, HitNormal);
+    //Velocity = FVector::VectorPlaneProject(Velocity, HitNormal);
 }
 
 
@@ -185,5 +185,7 @@ void UCustomGravityPawnMovement::UpdateCapsuleRotation(float DeltaTime, const FV
 FVector UCustomGravityPawnMovement::GetGravityDirection() const
 {
 
-    return (EarthLocation - CapsuleComponent->GetComponentLocation()).GetSafeNormal();
+    FVector grav=(EarthLocation - CapsuleComponent->GetComponentLocation()).GetSafeNormal();
+	GEngine->AddOnScreenDebugMessage(2, 20.f, FColor::Purple, grav.ToString());
+	return grav;
 }

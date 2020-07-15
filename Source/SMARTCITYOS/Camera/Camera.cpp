@@ -26,10 +26,10 @@ FRotator Camera::GetRotation() const
     return Rotation;
 }
 
-FRotator Camera::GetRelativeRotation() const 
-{ 
-    return RelativeRotation; 
-} 
+FRotator Camera::GetRelativeRotation() const
+{
+	return RelativeRotation;
+}
 
 FVector Camera::GetUpDirection() const
 {
@@ -86,11 +86,6 @@ FVector Camera::GetCameraRight() const
     return CameraRight;
 }
 
-FVector Camera::GetCameraForward() const
-{
-    return CameraForward;
-}
-
 void Camera::SetFOV(float _FOV)
 {
     this->FOV = _FOV;
@@ -98,6 +93,7 @@ void Camera::SetFOV(float _FOV)
 
 void Camera::SetLocation(FVector _Location)
 {
+   
     this->Location = _Location;
 }
 
@@ -106,15 +102,15 @@ void Camera::SetRotation(FRotator _Rotation)
 	this->Rotation = _Rotation;
 }
 
+void Camera::SetRelativeRotation(FRotator _RelativeRotation)
+{
+	RelativeRotation = _RelativeRotation;
+}
+
 void Camera::SetRotation(FQuat _Rotation)
 {
 	this->Rotation = _Rotation.Rotator();
 }
-
-void Camera::SetRelativeRotation(FRotator _RelativeRotation) 
-{ 
-    RelativeRotation=_RelativeRotation; 
-} 
 
 void Camera::SetUpDirection(FVector _UpDirection)
 {
@@ -153,12 +149,17 @@ void Camera::SetCameraRight(const FVector& _CameraRight)
     this->CameraRight = _CameraRight;
 }
 
-void Camera::SetCameraForward(const FVector& _CameraForward)
-{
-    this->CameraForward = CameraForward;
-}
-
 void Camera::SetEarthLocation(FVector _EarthLocation)
 {
 	this->EarthLocation = _EarthLocation;
+}
+
+Camera * Camera::CameraTransform(FMatrix InMatrix)
+{
+	Camera* NewCamera = this;
+	FVector NewCameraLocation = InMatrix.InverseTransformPosition(this->GetLocation());
+	FRotator NewCameraRotation = InMatrix.InverseTransformVector(this->GetRotation().Vector()).Rotation();
+	NewCamera->SetLocation(NewCameraLocation);
+	NewCamera->SetRotation(NewCameraRotation);
+	return NewCamera;
 }

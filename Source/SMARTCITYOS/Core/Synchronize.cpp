@@ -3,6 +3,7 @@
 
 #include "Synchronize.h"
 #include "UESceneTools.h"
+#include "Kismet/GameplayStatics.h"
 
 
 extern SMARTCITYOS_API class AUESceneTools GUESceneTools;
@@ -17,7 +18,6 @@ Synchronize::~Synchronize()
 {
 }
 
-//定义UEMap对象
 AActor* Synchronize::MapActor;
 //定义Camera对象(OS内)
 Camera* Synchronize::CameraState;
@@ -28,6 +28,10 @@ UCameraComponent* Synchronize::UECamera;
 GroundBody* Synchronize::BodyState;
 
 AInputPawn* Synchronize::UserInput;
+
+
+
+
 
  void Synchronize::SynchronizeCameraToUE()
  {
@@ -76,9 +80,8 @@ AInputPawn* Synchronize::UserInput;
 
  void Synchronize::SynchronizeCameraToSCOS()
  {
- 	CameraState->SetCameraForward(UECamera->GetForwardVector());
- 	CameraState->SetCameraRight(UECamera->GetRightVector());
-     //将UE相机的位置传回本地相机
+	 CameraState->SetCameraRight(UECamera->GetRightVector());
+	 //将UE相机的位置传回本地相机
 	 CameraState->SetLocation(UECamera->GetComponentLocation());
 	 CameraState->SetRotation(UECamera->GetComponentRotation());
 	 CameraState->SetAspectRatio(UECamera->AspectRatio);
@@ -86,6 +89,7 @@ AInputPawn* Synchronize::UserInput;
 	 CameraState->SetFOV(UECamera->FieldOfView);
 	 CameraState->SetIsPerspectView(UECamera->ProjectionMode == ECameraProjectionMode::Perspective);
 	 CameraState->SetUpDirection(UECamera->GetUpVector());
+
 	 CameraState->SetNearClipPlane(GNearClippingPlane);
 
 	 FMatrix TranslateMatrix = FTranslationMatrix(-CameraState->GetLocation());
@@ -132,7 +136,7 @@ AInputPawn* Synchronize::UserInput;
 	 }
 
 	 auto CurrentForward = BodyState->GetCurrentForward();
-	 if (FMath::Abs(CurrentForward.Value) < KINDA_SMALL_NUMBER)
+	 if (FMath::Abs(CurrentForward.Value) > KINDA_SMALL_NUMBER)
 	 {
 		 UserInput->AddMovementInput(CurrentForward.Key.GetSafeNormal(), CurrentForward.Value, false);
 		 CurrentForward.Value = 0.f;
@@ -140,11 +144,11 @@ AInputPawn* Synchronize::UserInput;
 	 }
 
 	 auto CurrentRight = BodyState->GetCurrentRight();
-	 if (FMath::Abs(CurrentRight.Value) < KINDA_SMALL_NUMBER)
+	 if (FMath::Abs(CurrentRight.Value) > KINDA_SMALL_NUMBER)
 	 {
 		 UserInput->AddMovementInput(CurrentRight.Key.GetSafeNormal(), CurrentRight.Value, false);
 		 CurrentRight.Value = 0.f;
-		 BodyState->SetCurrentForward(CurrentRight);
+		 BodyState->SetCurrentRight(CurrentRight);
 	 }
  }
 
@@ -157,8 +161,10 @@ AInputPawn* Synchronize::UserInput;
 
  void Synchronize::UpdateActorLocation() {
 	 UserInput->SetActorLocation(BodyState->GetActorLocation());
- 	
- 	 CameraState->SetRelativeRotation(UECamera->GetRelativeRotation());
+	 UECamera->SetRelativeLocation(FVector::ZeroVector);
+	 UECamera->SetRelativeRotation(FRotator::ZeroRotator);
+	 CameraState->SetRelativeRotation(UECamera->GetRelativeRotation());
+	 GNearClippingPlane = CameraState->GetNearClipPlane();
  }
 
  void Synchronize::GroundModeUpdate() {

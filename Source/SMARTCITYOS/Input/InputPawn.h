@@ -32,7 +32,6 @@ protected:
     virtual void BeginPlay() override;
 
 public:
-    void MouseY(float value);
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -51,9 +50,11 @@ public:
 
     void PressedAction(FKey key);
     void ReleasedAction(FKey key);
+    // void DoubleClick(FKey key);
     void WAxis(float value);
     void DAxis(float value);
     void MouseX(float value);
+    void MouseY(float value);
 
     /////////////////////////////////////////////////////////////////////////////
     ///Ground模式

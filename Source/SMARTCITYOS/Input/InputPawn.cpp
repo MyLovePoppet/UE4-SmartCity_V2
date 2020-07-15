@@ -41,7 +41,7 @@ AInputPawn::AInputPawn()
         CapsuleComponent->SetWorldLocation(FVector::ZeroVector);
         CapsuleComponent->InitCapsuleSize(42.0f, 96.0f);
         CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-        CapsuleComponent->SetSimulatePhysics(true);
+        CapsuleComponent->SetSimulatePhysics(false);
         CapsuleComponent->SetEnableGravity(false);
         RootComponent = CapsuleComponent;
         CapsuleComponent->GetBodyInstance()->COMNudge = FVector(0.0f, 0.0f, -96.0f);
@@ -74,6 +74,10 @@ void AInputPawn::BeginPlay()
 void AInputPawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    for (auto& listener : inputListeners)
+    {
+        listener->OnTick(DeltaTime);
+    }
 }
 
 UCameraComponent* AInputPawn::GetUECamera()
@@ -115,7 +119,7 @@ void AInputPawn::MouseRMove(float value)
 
 void AInputPawn::PressedAction(FKey key)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, key.ToString());
+    //GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, key.ToString());
     FVector2D currentCursorPt;
     GetWorld()->GetFirstPlayerController()->GetMousePosition(currentCursorPt.X, currentCursorPt.Y);
     if (key == EKeys::LeftMouseButton)
@@ -133,20 +137,21 @@ void AInputPawn::PressedAction(FKey key)
         for (InputBase* il : inputListeners)
             il->OnMouseRButtonDown(currentCursorPt);
     }
-    else if (key == EKeys::LeftAlt)
-    {
-        InputBase::bOnLeftAlt = true;
-    }
-    else if (key == EKeys::LeftControl)
-    {
-        InputBase::bOnLeftControl = true;
-    }
-    else if (key == EKeys::LeftShift)
-    {
-        InputBase::bOnLeftShift = true;
-    }
     else
     {
+        if (key == EKeys::LeftAlt)
+        {
+            InputBase::bOnLeftAlt = true;
+        }
+        else if (key == EKeys::LeftControl)
+        {
+            InputBase::bOnLeftControl = true;
+        }
+        else if (key == EKeys::LeftShift)
+        {
+            InputBase::bOnLeftShift = true;
+        }
+
         for (InputBase* il : inputListeners)
             il->OnKeyDown(key);
     }
@@ -171,24 +176,31 @@ void AInputPawn::ReleasedAction(FKey key)
         for (InputBase* il : inputListeners)
             il->OnMouseRButtonUp(currentCursorPt);
     }
-    else if (key == EKeys::LeftAlt)
-    {
-        InputBase::bOnLeftAlt = false;
-    }
-    else if (key == EKeys::LeftControl)
-    {
-        InputBase::bOnLeftControl = false;
-    }
-    else if (key == EKeys::LeftShift)
-    {
-        InputBase::bOnLeftShift = false;
-    }
     else
     {
+        if (key == EKeys::LeftAlt)
+        {
+            InputBase::bOnLeftAlt = false;
+        }
+        else if (key == EKeys::LeftControl)
+        {
+            InputBase::bOnLeftControl = false;
+        }
+        else if (key == EKeys::LeftShift)
+        {
+            InputBase::bOnLeftShift = false;
+        }
+
         for (InputBase* il : inputListeners)
             il->OnKeyUp(key);
     }
 }
+
+// void AInputPawn::DoubleClick(FKey key)
+// {
+//     for (InputBase* il : inputListeners)
+//         il->OnDoubleClick(key);
+// }
 
 //按下W时value=1.f；S是value=-1.f
 void AInputPawn::WAxis(float value)
@@ -222,15 +234,23 @@ void AInputPawn::MouseY(float value)
 void AInputPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
-    // TArray<FKey> ActionKeys = {EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven,EKeys::LeftShift,EKeys::LeftControl,EKeys::LeftAlt,
-    // EKeys::LeftMouseButton,EKeys::MiddleMouseButton,EKeys::RightMouseButton};
+
+    // TArray<FKey> ActionKeys = {
+    //     EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven,
+    //     EKeys::SpaceBar,
+    //     EKeys::LeftShift, EKeys::LeftControl, EKeys::LeftAlt,
+    //     EKeys::LeftMouseButton, EKeys::MiddleMouseButton, EKeys::RightMouseButton
+    // };
     // for (FKey key : ActionKeys)
     // {
     //     UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping(key.GetFName(), key));
     //     PlayerInputComponent->BindAction(key.GetFName(), IE_Released, this, &AInputPawn::ReleasedAction);
     //     PlayerInputComponent->BindAction(key.GetFName(), IE_Pressed, this, &AInputPawn::PressedAction);
     // }
-    //
+    // // FKey key=EKeys::LeftMouseButton;
+    // // UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping(key.GetFName(), key));
+    // // PlayerInputComponent->BindAction(key.GetFName(), IE_DoubleClick, this, &AInputPawn::DoubleClick);
+    // //
     // //鼠标左键	
     // UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MouseLeft", EKeys::LeftMouseButton, 1.0f));
     // PlayerInputComponent->BindAxis("MouseLeft", this, &AInputPawn::MouseLMove);

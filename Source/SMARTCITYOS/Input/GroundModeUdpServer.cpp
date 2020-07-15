@@ -27,8 +27,10 @@ void AGroundModeUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
             {
                 float ForwardAxisValue = JsonObject->GetNumberField("VeticalAxis");
                 ForwardAxisValue = FMath::Clamp(ForwardAxisValue, -1.f, 1.f);
+                //ForwardAxisValue = FMath::Sign(ForwardAxisValue);
                 float RightAxisValue = JsonObject->GetNumberField("HorizontalAxis");
                 RightAxisValue = FMath::Clamp(RightAxisValue, -1.f, 1.f);
+                //RightAxisValue = FMath::Sign(RightAxisValue);
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
                     IInputBase->WAxis(ForwardAxisValue);
@@ -69,11 +71,11 @@ void AGroundModeUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
             {
                 float YawValue = JsonObject->GetNumberField("distanceX");
                 YawValue /= PhonePCScreenSize::PhoneScreenSize.X;
-                YawValue = FMath::Clamp(YawValue, -1.f, 1.f);
+                YawValue = FMath::Clamp(YawValue, -1.f, 1.f) * 180.f;
 
-                float PitchValue = JsonObject->GetNumberField("pitchValue");
+                float PitchValue = JsonObject->GetNumberField("distanceY");
                 PitchValue /= PhonePCScreenSize::PhoneScreenSize.Y;
-                PitchValue = FMath::Clamp(PitchValue, -1.f, 1.f);
+                PitchValue = FMath::Clamp(PitchValue, -1.f, 1.f) * 180.f;
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
                     IInputBase->MouseX(YawValue);

@@ -19,7 +19,11 @@ public:
 
     virtual void OnMouseLButtonDown(FVector2D position)
     {
-    };
+    }
+
+    // virtual void OnDoubleClick(FKey Key)
+    // {
+    // };
 
     virtual void OnMouseLButtonUp(FVector2D position)
     {
@@ -79,6 +83,15 @@ public:
     };
 
     virtual void OnKeyDown(FKey key)
+    {
+    };
+
+    //////////////////////
+    virtual void Scale(float value)
+    {
+    };
+
+    virtual void OnTick(float DeltaTime)
     {
     };
 };
