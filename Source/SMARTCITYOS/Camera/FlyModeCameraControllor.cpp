@@ -205,7 +205,17 @@ void FlyModeCameraControllor::OnMouseMMove(FVector2D position, float value)
         oldMidCursorPt = currentMidCursorPt;
     }
 }
-
+void FlyModeCameraControllor::Rotate(FVector2D position,float value)
+{
+    FVector WorldPos = FVector::ZeroVector;
+    if (ViewPortToWorldSafety(position, WorldPos))
+    {
+        VirtualRadius = (WorldPos - EarthLocation).Size();
+        //获取屏幕坐标对应的地球上3D坐标
+        MidHoldAxis = GetPointToCenterVector(WorldPos);
+        RotateEarthByAxis(value);
+    }
+}
 void FlyModeCameraControllor::OnMouseRButtonDown(FVector2D position)
 {
     oldCursorPt = position;
@@ -240,7 +250,7 @@ void FlyModeCameraControllor::OnMouseRMove(FVector2D position, float value)
         //根据右键y偏移量得速率。
         float SpeedY = (currentCursorPt.Y - oldCursorPt.Y) / SizeY;
         //SpeedY = FMath::Clamp(SpeedY, -0.1f, 0.1f);
-        Zoom(SpeedY);
+        Zoom(position,SpeedY);
     }
 }
 
@@ -249,17 +259,16 @@ void FlyModeCameraControllor::OnMouseWheel(FVector2D position, float value)
     FVector WorldPos;
     if (FMath::Abs(value) > 1e-6)
     {
-        oldCursorPt = position;
-        if (ViewPortToWorldSafety(oldCursorPt, WorldPos))
+        if (ViewPortToWorldSafety(position, WorldPos))
         {
             VirtualRadius = (WorldPos - EarthLocation).Size();
-            Zoom(value);
+            Zoom(position,value);
         }
     }
 }
 
 //放大/缩小,速率由Speed控制。
-void FlyModeCameraControllor::Zoom(const float Speed)
+void FlyModeCameraControllor::Zoom(FVector2D &position, float Speed)
 {
     //GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, FString::SanitizeFloat(Speed));
 
@@ -273,7 +282,7 @@ void FlyModeCameraControllor::Zoom(const float Speed)
     FVector WorldPt;
     FVector WorldDirection;
 
-    ScreenCursorInfoToWorld(oldCursorPt, WorldPt, WorldDirection);
+    ScreenCursorInfoToWorld(position, WorldPt, WorldDirection);
     FVector IntersectPt;
 
     //放大/缩小后，屏幕射线与地球交点

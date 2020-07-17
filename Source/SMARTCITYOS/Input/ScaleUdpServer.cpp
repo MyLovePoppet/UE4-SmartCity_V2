@@ -32,24 +32,26 @@ void AScaleUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
                     IInputBase->OnMouseWheel(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), Value);
+                    //IInputBase->Scale( Value/5.f);
                 }
                 break;
             }
         case EOperationType::FLY_MODE_START:
             {
-                float X = JsonObject->GetNumberField("coordinateX");
-                float Y = JsonObject->GetNumberField("coordinateY");
-                FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
-                //按下三个鼠标按键
-                for (auto& IIputBase : AInputPawn::inputListeners)
-                {
-                    IIputBase->OnMouseLButtonDown(PCLocation);
-                    //IIputBase->OnMouseLButtonUp(PCLocation);
-                    IIputBase->OnMouseMidButtonDown(PCLocation);
-                    IIputBase->OnMouseRButtonDown(PCLocation);
-                }
-                LastRotatePosition = PCLocation;
-                break;
+                // float X = JsonObject->GetNumberField("coordinateX");
+                // float Y = JsonObject->GetNumberField("coordinateY");
+                // FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
+                // //FVector2D PCLocation = PhonePCScreenSize::PhoneScreenSize / 2.f;
+                // //按下三个鼠标按键
+                // for (auto& IIputBase : AInputPawn::inputListeners)
+                // {
+                //     IIputBase->OnMouseLButtonDown(PCLocation);
+                //     //IIputBase->OnMouseLButtonUp(PCLocation);
+                //     IIputBase->OnMouseMidButtonDown(PCLocation);
+                //     IIputBase->OnMouseRButtonDown(PCLocation);
+                // }
+                // LastRotatePosition = PCLocation;
+                // break;
             }
         default:
             break;

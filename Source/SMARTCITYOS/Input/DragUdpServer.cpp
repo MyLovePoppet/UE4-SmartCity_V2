@@ -28,9 +28,12 @@ void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
             {
                 float X = JsonObject->GetNumberField("coordinateX");
                 float Y = JsonObject->GetNumberField("coordinateY");
+                //FVector2D PCLocation = CurrentLocation + FVector2D(X, Y);
+                //CurrentLocation = PCLocation;
+                FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
-                    IInputBase->OnMouseLMove(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), 1.0f);
+                    IInputBase->OnMouseLMove(PCLocation, 1.0f);
                 }
                 break;
             }
@@ -39,6 +42,8 @@ void ADragUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 float X = JsonObject->GetNumberField("coordinateX");
                 float Y = JsonObject->GetNumberField("coordinateY");
                 FVector2D PCLocation = UdpServerUtilities::ToPCLocation(FVector2D(X, Y));
+                //FVector2D PCLocation = PhonePCScreenSize::PhoneScreenSize / 2.f;
+                //CurrentLocation = PCLocation;
                 //按下三个鼠标按键
                 for (auto& IIputBase : AInputPawn::inputListeners)
                 {

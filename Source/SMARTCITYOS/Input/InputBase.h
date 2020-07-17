@@ -87,11 +87,15 @@ public:
     };
 
     //////////////////////
-    virtual void Scale(float value)
+    // virtual void Scale(float value)
+    // {
+    // };
+
+    virtual void OnTick(float)
     {
     };
 
-    virtual void OnTick(float DeltaTime)
+    virtual void Rotate(FVector2D, float)
     {
-    };
+    }
 };

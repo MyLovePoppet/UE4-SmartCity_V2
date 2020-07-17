@@ -9,6 +9,7 @@ InputBase::InputBase()
 {
     RegisterListener();
 }
+
 InputBase::~InputBase()
 {
     UnRegisterListener();

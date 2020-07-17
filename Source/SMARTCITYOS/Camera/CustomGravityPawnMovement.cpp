@@ -30,7 +30,7 @@ UCustomGravityPawnMovement::UCustomGravityPawnMovement(): Super()
 void UCustomGravityPawnMovement::TickComponent(float DeltaTime, enum ELevelTick TickType,
                                                FActorComponentTickFunction* ThisTickFunction)
 {
-    if(bIsWork)
+    if (bIsWork)
     {
         FVector Gravity = GetGravityDirection() * GravityPower; //GetGravityZ();
         Velocity += Gravity * DeltaTime;
@@ -45,11 +45,13 @@ void UCustomGravityPawnMovement::TickComponent(float DeltaTime, enum ELevelTick 
         const FVector TraceStart = CapsuleComponent->GetComponentLocation();
         const float CapsuleHalfHeight = CapsuleComponent->GetScaledCapsuleHalfHeight();
         float ShapeRadius = CapsuleComponent->GetScaledCapsuleRadius() * 0.99f;
-        FVector TraceEnd = TraceStart - CapsuleComponent->GetUpVector() * (CapsuleHalfHeight - ShapeRadius + 30.f + 1.0f);
+        FVector TraceEnd = TraceStart - CapsuleComponent->GetUpVector() * (CapsuleHalfHeight - ShapeRadius + 30.f + 1.0f
+        );
         FHitResult HitResult;
         TArray<AActor*> ActorsToIgnore;
         UKismetSystemLibrary::SphereTraceSingle(this, TraceStart, TraceEnd, ShapeRadius,
-                                                UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true,
+                                                UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
+                                                true,
                                                 ActorsToIgnore, DrawDebugType, HitResult, true);
         bIsInAir = !HitResult.bBlockingHit;
         TimeInAir = bIsInAir ? TimeInAir + DeltaTime : 0.0f;
@@ -100,7 +102,7 @@ void UCustomGravityPawnMovement::DoSprint()
 
 void UCustomGravityPawnMovement::DoStopSprint()
 {
-   // GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red, "Stop");
+    // GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Red, "Stop");
     MaxSpeed = LastWalkSpeed;
     bIsSprinting = false;
 }
@@ -110,13 +112,13 @@ void UCustomGravityPawnMovement::CapsuleHited(class UPrimitiveComponent* MyComp,
                                               FVector HitLocation, FVector HitNormal, FVector NormalImpulse,
                                               const FHitResult& Hit)
 {
-    
     // SinAngleHitPlane = FMath::Sqrt(
     //     FVector::VectorPlaneProject((-GetGravityDirection()), HitNormal).SizeSquared() / GetGravityDirection().
     //     SizeSquared());
 
     //碰撞后将垂直碰撞面的速度置零
-    //Velocity = FVector::VectorPlaneProject(Velocity, HitNormal);
+    Velocity = FVector::VectorPlaneProject(Velocity, HitNormal);
+    Velocity += GetGravityDirection() * 10.f;
 }
 
 
@@ -184,8 +186,7 @@ void UCustomGravityPawnMovement::UpdateCapsuleRotation(float DeltaTime, const FV
 
 FVector UCustomGravityPawnMovement::GetGravityDirection() const
 {
-
-    FVector grav=(EarthLocation - CapsuleComponent->GetComponentLocation()).GetSafeNormal();
-	GEngine->AddOnScreenDebugMessage(2, 20.f, FColor::Purple, grav.ToString());
-	return grav;
+    FVector grav = (EarthLocation - CapsuleComponent->GetComponentLocation()).GetSafeNormal();
+    GEngine->AddOnScreenDebugMessage(2, 20.f, FColor::Purple, grav.ToString());
+    return grav;
 }

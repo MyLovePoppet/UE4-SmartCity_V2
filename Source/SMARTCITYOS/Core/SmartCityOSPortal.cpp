@@ -27,6 +27,8 @@ void ASmartCityOSPortal::BeginPlay()
 
     //初始化CameraState,用于判断视点是否发生变化
     CameraState = SCOSCameraControllor->CameraState;
+
+    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 }
 
 //void ASmartCityOSPortal::PostInitializeComponents() {
@@ -115,7 +117,7 @@ void ASmartCityOSPortal::GenerateCamera()
     GroundModeCache->Stop();
     SCOSCameraControllor = FlyModeCache;
     SCOSCameraControllor->Restart();
-    
+
     Synchronize::SynchronizeCameraToUE();
 
     //new FlyToCameraControllor();
@@ -151,14 +153,13 @@ void ASmartCityOSPortal::ChangeControllorMod()
             Synchronize::SynchronizeCameraToUE();
             SCOSCameraControllor = GroundModeCache;
             //转为地面模式
-            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.152"));
+            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.247"));
             // for (auto& IIputBase : AInputPawn::inputListeners)
             // {
             //     IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);
             //     IIputBase->OnMouseMidButtonUp(FVector2D::ZeroVector);
             //     IIputBase->OnMouseRButtonUp(FVector2D::ZeroVector);
             // }
-            
         }
     }
     else if (SCOSCameraControllor == GroundModeCache)

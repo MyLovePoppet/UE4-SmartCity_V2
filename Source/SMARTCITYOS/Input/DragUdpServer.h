@@ -12,11 +12,12 @@
 UCLASS()
 class SMARTCITYOS_API ADragUdpServer : public AUdpServerBase
 {
-	GENERATED_BODY()
-	
-	protected:
+    GENERATED_BODY()
+
+protected:
+    //FVector2D CurrentLocation;
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-	virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject) override;
+    virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject) override;
 };

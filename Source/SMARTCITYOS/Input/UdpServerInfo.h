@@ -20,11 +20,13 @@ enum class EOperationType:unsigned char
     GROUND_MODE_JUMP,
     //跳跃            {type:"GROUND_MODE_JUMP"}
     GROUND_MODE_START_SPRINT,
+    //暂时无用
     //开始加速          {type:"GROUND_MODE_START_SPRINT"}
     GROUND_MODE_STOP_SPRINT,
+    //暂时无用
     //结束加速          {type:"GROUND_MODE_STOP_SPRINT"}
 
-    GROUND_MODE_CAMERA_MOVE //视角上下左右摇晃    {type:"GROUND_MODE_CAMERA_MOVE",distanceX:950, distanceY:264}
+    GROUND_MODE_CAMERA_MOVE //视角上下左右摇晃    {type:"GROUND_MODE_CAMERA_MOVE",distanceX:1.50, distanceY:2.1}
 };
 
 namespace EOperationPort
@@ -34,14 +36,14 @@ namespace EOperationPort
     //拖拽
     const size_t FLY_MODE_SCALE = 9097;
     const size_t FLY_MODE_ROTATE = 9096;
-    const size_t GROUND_MODE = 9095;
-    //const size_t GROUND_MODE_CAMERA = 9094;
+    const size_t GROUND_MODE_MOVE = 9095;
+    const size_t GROUND_MODE_CAMERA = 9094;
     const size_t SEND_BACK_PORT = 9077;
 }
 
 namespace PhonePCScreenSize
 {
-    const FVector2D PhoneScreenSize = FVector2D(2244.0f, 1080.f);
+    const FVector2D PhoneScreenSize = FVector2D(2560.0f, 1600.f);
     const FVector2D PCScreenSize = FVector2D(1920.0f, 980.f);
 }
 
@@ -50,4 +52,3 @@ namespace SendBackMessage
     const FString MESSAGE_MODE_CHANGE_TO_GROUND = TEXT("{type:\"MODE_CHANGE_TO_GROUND\"}");
     const FString MESSAGE_MODE_CHANGE_TO_FLY = TEXT("{type:\"MODE_CHANGE_TO_FLY\"}");
 }
- 

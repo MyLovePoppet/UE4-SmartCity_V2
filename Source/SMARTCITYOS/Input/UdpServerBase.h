@@ -15,7 +15,7 @@ protected:
     FSocket* Socket;
     FUdpSocketReceiver* UdpSocketReceiver;
 
-    FVector2D LastRotatePosition;
+    //FVector2D LastRotatePosition;
 
     // Sets default values for this actor's properties
     AUdpServerBase();

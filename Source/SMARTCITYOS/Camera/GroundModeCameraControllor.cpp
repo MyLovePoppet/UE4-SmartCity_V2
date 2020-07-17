@@ -35,10 +35,10 @@ void GroundModeCameraControllor::Stop()
 
 void GroundModeCameraControllor::AddForwardMovementInput(float ScaleValue) const
 {
-	const FVector RightDirection = CameraState->GetCameraRight();
+    const FVector RightDirection = CameraState->GetCameraRight();
     const FVector UpDirection = BodyState->GetUpDirection();
-	FQuat RightToForward = FQuat(UpDirection, -3.14159 / 2);
-	const FVector CameraForward = RightToForward.RotateVector(RightDirection);
+    FQuat RightToForward = FQuat(UpDirection, -3.14159 / 2);
+    const FVector CameraForward = RightToForward.RotateVector(RightDirection);
     //const float Dot = FVector::DotProduct(UpDirection, CameraForward);
 
     //if (FMath::Abs(Dot) < 1 - SMALL_NUMBER)
@@ -130,7 +130,6 @@ void GroundModeCameraControllor::MouseY(float value)
 
 void GroundModeCameraControllor::WAxis(float value)
 {
-
     AddForwardMovementInput(value);
 }
 

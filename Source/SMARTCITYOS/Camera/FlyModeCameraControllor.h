@@ -39,7 +39,7 @@ protected:
 
     FVector GetHorizontalVector();
 
-    void Zoom(float Speed);
+    void Zoom(FVector2D &position,float Speed);
 
     void RotateByFVector(FVector centerToIntersectVec, FVector centerToNextIntersectVec);
 
@@ -56,8 +56,10 @@ public:
     virtual void OnMouseMidButtonDown(FVector2D position) override;
     virtual void OnMouseMidButtonUp(FVector2D position) override;
     void OnMouseMMove(FVector2D position, float value) override;
+    void Rotate(FVector2D position, float value);
 
     virtual void OnMouseWheel(FVector2D position, float value) override;
+//    virtual void Scale(float value) override;
 
     bool ViewPortToWorldSafety(FVector2D ScreenPos, FVector& out_WorldPos);
     //void MidButtonDown();
