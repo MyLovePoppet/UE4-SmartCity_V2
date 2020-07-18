@@ -153,7 +153,7 @@ void ASmartCityOSPortal::ChangeControllorMod()
             Synchronize::SynchronizeCameraToUE();
             SCOSCameraControllor = GroundModeCache;
             //转为地面模式
-            UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.247"));
+            //UdpServerUtilities::SendDataWithUdp(SendBackMessage::MESSAGE_MODE_CHANGE_TO_GROUND,TEXT("192.168.50.247"));
             // for (auto& IIputBase : AInputPawn::inputListeners)
             // {
             //     IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);

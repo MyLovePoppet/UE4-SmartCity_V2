@@ -18,6 +18,5 @@ protected:
     //FVector2D CurrentLocation;
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
-
     virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject) override;
 };

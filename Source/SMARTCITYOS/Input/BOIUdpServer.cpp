@@ -1,36 +1,44 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-// Fill out your copyright notice in the Description page of Project Settings.
+#include "BOIUdpServer.h"
 
-
-#include "UdpServerBase.h"
-
-#include "InputPawn.h"
-
-
-// Sets default values
-AUdpServerBase::AUdpServerBase()
+bool FBoiUdpReceiver::Init()
 {
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = true;
     if (UdpServerUtilities::OperationMap.Num() == 0)
     {
         UdpServerUtilities::InitOperationMap();
     }
+    bool isSuccess;
+    StartUDPReceiver("DragUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_DRAG, isSuccess);
+    if (!isSuccess)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Init falied!");
+    }
+    return isSuccess;
 }
 
-// Called when the game starts or when spawned
-void AUdpServerBase::BeginPlay()
+uint32 FBoiUdpReceiver::Run()
 {
-    Super::BeginPlay();
+    while (true)
+    {
+        FString JsonStr;
+        bool isSuccess;
+        DataRecv(JsonStr, isSuccess);
+        if (isSuccess)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);
+            TSharedPtr<FJsonObject> JsonObject;
+            if (UdpServerUtilities::GetJsonObjectFromJsonFString(JsonStr, JsonObject))
+            {
+                Handle(JsonObject);
+            }
+        }
+    }
 }
 
-void AUdpServerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void FBoiUdpReceiver::Stop()
 {
-    Super::EndPlay(EndPlayReason);
-    //~~~~~~~~~~~~~~~~
-
     if (UdpSocketReceiver)
         delete UdpSocketReceiver;
     UdpSocketReceiver = nullptr;
@@ -42,35 +50,10 @@ void AUdpServerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
         Socket->Close();
         ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
     }
-    //释放三个鼠标按键
-    for (auto& IIputBase : AInputPawn::inputListeners)
-    {
-        IIputBase->OnMouseLButtonUp(FVector2D::ZeroVector);
-        IIputBase->OnMouseMidButtonUp(FVector2D::ZeroVector);
-        IIputBase->OnMouseRButtonUp(FVector2D::ZeroVector);
-    }
 }
 
-// Called every frame
-void AUdpServerBase::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-    FString JsonStr;
-    bool isSuccess;
-    DataRecv(JsonStr, isSuccess);
-    if (isSuccess)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);
-        TSharedPtr<FJsonObject> JsonObject;
-        if (UdpServerUtilities::GetJsonObjectFromJsonFString(JsonStr, JsonObject))
-        {
-            Handle(JsonObject);
-        }
-    }
-}
-
-void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort,
-                                      bool& success)
+void FBoiUdpReceiver::StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort,
+                                       bool& success)
 {
     TSharedRef<FInternetAddr> targetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     FIPv4Address Addr;
@@ -79,10 +62,10 @@ void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const
     FIPv4Endpoint Endpoint(FIPv4Address::Any, ThePort); //所有ip地址本地
     //FIPv4Endpoint Endpoint(Addr, ThePort);                 //指定ip地址
     Socket = FUdpSocketBuilder(*YourChosenSocketName)
-             .AsNonBlocking()
+             .AsBlocking()
              .AsReusable()
              .BoundToEndpoint(Endpoint)
-             .WithReceiveBufferSize(2 * 1024 * 1024);
+             .WithReceiveBufferSize(/*2 * 1024 * */1024);
     //BUFFER SIZE
     int32 BufferSize = 1024;
     Socket->SetSendBufferSize(BufferSize, BufferSize);
@@ -98,11 +81,9 @@ void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const
         GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red,TEXT("The receiver is initialized"));
         success = true;
     }
-
-    //return true;
 }
 
-void AUdpServerBase::DataRecv(FString& str, bool& success)
+void FBoiUdpReceiver::DataRecv(FString& str, bool& success)
 {
     if (!Socket)
     {
@@ -136,6 +117,32 @@ void AUdpServerBase::DataRecv(FString& str, bool& success)
     //return success;
 }
 
-void AUdpServerBase::Handle(const TSharedPtr<FJsonObject>& JsonObject)
+void FBoiUdpReceiver::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 {
+}
+
+// Sets default values
+ABOIUdpServer::ABOIUdpServer()
+{
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
+}
+
+// Called when the game starts or when spawned
+void ABOIUdpServer::BeginPlay()
+{
+    Super::BeginPlay();
+    DragUdpRunnable = MakeShareable(new FBoiUdpReceiver());
+    DragUdpThread = MakeShareable(FRunnableThread::Create(DragUdpRunnable.Get(),TEXT("DragUdpThread")));
+}
+
+void ABOIUdpServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    DragUdpThread->Kill(false);
+}
+
+// Called every frame
+void ABOIUdpServer::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
 }

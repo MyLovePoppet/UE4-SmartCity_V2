@@ -15,7 +15,6 @@ protected:
     FSocket* Socket;
     FUdpSocketReceiver* UdpSocketReceiver;
 
-    //FVector2D LastRotatePosition;
 
     // Sets default values for this actor's properties
     AUdpServerBase();
@@ -30,7 +29,7 @@ public:
 
     void StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort,
                           bool& success); // 接收器初始化  接收信息前
-
+    
     void DataRecv(FString& str, bool& success);
 protected:
     virtual void Handle(const TSharedPtr<FJsonObject>& JsonObject);
