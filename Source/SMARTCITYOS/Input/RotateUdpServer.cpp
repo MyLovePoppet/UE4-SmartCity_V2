@@ -9,7 +9,7 @@ void ARotateUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("RotateUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_ROTATE, isSuccess);
+    StartUDPReceiver("RotateUDPServer", "127.0.0.1", EOperationPort::FLY_MODE_ROTATE, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Rotate server Init falied!");
@@ -36,7 +36,7 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                     // FVector2D CurrentLocation = LastRotatePosition + FVector2D(XOffset, 0.f);
                     // IInputBase->OnMouseMMove(CurrentLocation, 1.0f);
                     //LastRotatePosition = CurrentLocation;
-                    IInputBase->Rotate(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), RotateAngle / 10.f);
+                    IInputBase->Rotate(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), RotateAngle / 50.f);
                 }
                 break;
             }

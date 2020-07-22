@@ -32,8 +32,12 @@ void AUdpServerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
     //~~~~~~~~~~~~~~~~
 
     if (UdpSocketReceiver)
+    {
+        UdpSocketReceiver->Stop();
         delete UdpSocketReceiver;
-    UdpSocketReceiver = nullptr;
+        UdpSocketReceiver = nullptr;
+    }
+
 
     //Clear all sockets!
     //      makes sure repeat plays in Editor dont hold on to old sockets!
@@ -55,34 +59,31 @@ void AUdpServerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AUdpServerBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    FString JsonStr;
-    bool isSuccess;
-    DataRecv(JsonStr, isSuccess);
-    if (isSuccess)
+    //uint8 CurrentFrame = 0;
+    while (!OperationMessageQueue.IsEmpty() /*&& CurrentFrame < MAXFRAME*/)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);
         TSharedPtr<FJsonObject> JsonObject;
-        if (UdpServerUtilities::GetJsonObjectFromJsonFString(JsonStr, JsonObject))
-        {
-            Handle(JsonObject);
-        }
+        OperationMessageQueue.Dequeue(JsonObject);
+        Handle(JsonObject);
+        //CurrentFrame++;
     }
 }
 
 void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort,
                                       bool& success)
 {
-    TSharedRef<FInternetAddr> targetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+    //TSharedRef<FInternetAddr> targetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
     FIPv4Address Addr;
     FIPv4Address::Parse(TheIP, Addr);
     //Create Socket
     FIPv4Endpoint Endpoint(FIPv4Address::Any, ThePort); //所有ip地址本地
-    //FIPv4Endpoint Endpoint(Addr, ThePort);                 //指定ip地址
+    //FIPv4Endpoint Endpoint(Addr, ThePort); //指定ip地址
+
     Socket = FUdpSocketBuilder(*YourChosenSocketName)
              .AsNonBlocking()
              .AsReusable()
              .BoundToEndpoint(Endpoint)
-             .WithReceiveBufferSize(2 * 1024 * 1024);
+             .WithReceiveBufferSize(/*2 * 1024 * */1024);
     //BUFFER SIZE
     int32 BufferSize = 1024;
     Socket->SetSendBufferSize(BufferSize, BufferSize);
@@ -99,9 +100,30 @@ void AUdpServerBase::StartUDPReceiver(const FString& YourChosenSocketName, const
         success = true;
     }
 
+
+    FString name = "SMARTCITYOS UDP Receiver Thread";
+    UdpSocketReceiver = new FUdpSocketReceiver(Socket, FTimespan::FromMilliseconds(100), *name);
+    UdpSocketReceiver->OnDataReceived().BindLambda(
+        [this](const FArrayReaderPtr& arrayReader, const FIPv4Endpoint& endPoint)
+        {
+            char ansiiData[1024];
+            FMemory::Memcpy(ansiiData, arrayReader->GetData(), arrayReader->TotalSize()); //拷贝数据到接收器
+            ansiiData[arrayReader->TotalSize()] = 0; //判断数据结束
+            FString JsonStr = ANSI_TO_TCHAR(ansiiData); //字符串转换
+            GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Green, JsonStr);
+            TSharedPtr<FJsonObject> JsonObject;
+            if (UdpServerUtilities::GetJsonObjectFromJsonFString(JsonStr, JsonObject))
+            {
+                this->OperationMessageQueue.Enqueue(JsonObject);
+            }
+        }
+    );
+
+    UdpSocketReceiver->Start();
     //return true;
 }
 
+/*
 void AUdpServerBase::DataRecv(FString& str, bool& success)
 {
     if (!Socket)
@@ -135,7 +157,7 @@ void AUdpServerBase::DataRecv(FString& str, bool& success)
     }
     //return success;
 }
-
+*/
 void AUdpServerBase::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 {
 }

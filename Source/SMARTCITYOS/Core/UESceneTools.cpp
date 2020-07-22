@@ -52,7 +52,7 @@ bool AUESceneTools::ViewPortToWorld(FVector2D ScreenPos, FVector & outWorldPos)
 
 			// Get the pixel coordinates into -1..1 projection space
 			const float ScreenSpaceX = (NormalizedX - 0.5f) * 2.0f;
-			//´Ó×óÉÏ½ÇÎªÔ­µã×ª»»µ½×óÏÂ½ÇÎªÔ­µã
+			//ä»å·¦ä¸Šè§’ä¸ºåŸç‚¹è½¬æ¢åˆ°å·¦ä¸‹è§’ä¸ºåŸç‚¹
 			const float ScreenSpaceY = ((1.0f - NormalizedY) - 0.5f) * 2.0f;
 
 			// The start of the ray trace is defined to be at mousex,mousey,1 in projection space (z=1 is near, z=0 is far - this gives us better precision)
@@ -103,13 +103,13 @@ float AUESceneTools::GetDepthOnScreen(FVector2D TargetPoint)
 TArray<DepthPixel> AUESceneTools::GetDepthSurface(FVector2D & OutRenderTargetSize)
 {
 	//    float depth;
-	float* cpuDataPtr; // TextureÉî¶ÈÖµÊı×éÊ×µØÖ·
-	TArray<DepthPixel> mydata; //×îÖÕ»ñÈ¡É«Éî¶ÈÖµÊı¾İ
-	FIntPoint buffsize; //Éî¶È³¤¿í´óĞ¡XºÍY
+	float* cpuDataPtr; // Textureæ·±åº¦å€¼æ•°ç»„é¦–åœ°å€
+	TArray<DepthPixel> mydata; //æœ€ç»ˆè·å–è‰²æ·±åº¦å€¼æ•°æ®
+	FIntPoint buffsize; //æ·±åº¦é•¿å®½å¤§å°Xå’ŒY
 
-	ENQUEUE_RENDER_COMMAND(ReadSurfaceFloatCommand)( // ½«¶ÁÈ¡Éî¶ÈÊı¾İµÄÃüÁîÍÆ¸øäÖÈ¾Ïß³Ì½øĞĞÖ´ĞĞ
+	ENQUEUE_RENDER_COMMAND(ReadSurfaceFloatCommand)( // å°†è¯»å–æ·±åº¦æ•°æ®çš„å‘½ä»¤æ¨ç»™æ¸²æŸ“çº¿ç¨‹è¿›è¡Œæ‰§è¡Œ
 		[&cpuDataPtr, &mydata, &buffsize, &OutRenderTargetSize](FRHICommandListImmediate& RHICmdList)
-		//&cpuDataPtr, &mydata, &buffsizeÎª´«ÈëµÄÍâ²¿²ÎÊı
+		//&cpuDataPtr, &mydata, &buffsizeä¸ºä¼ å…¥çš„å¤–éƒ¨å‚æ•°
 	{
 		FSceneRenderTargets::Get(RHICmdList).AdjustGBufferRefCount(RHICmdList, 1);
 		FTexture2DRHIRef uTex2DRes = FSceneRenderTargets::Get(RHICmdList).GetSceneDepthSurface();
@@ -124,12 +124,12 @@ TArray<DepthPixel> AUESceneTools::GetDepthSurface(FVector2D & OutRenderTargetSiz
 		mydata.AddUninitialized(sx * sy);
 		uint32 Lolstrid = 0;
 		cpuDataPtr = static_cast<float*>(RHILockTexture2D(uTex2DRes, 0, RLM_ReadOnly, Lolstrid, true));
-		// ¼ÓËø»ñÈ¡¿É¶Ádepth TextureÉî¶ÈÖµÊı×éÊ×µØÖ·
-		memcpy(mydata.GetData(), cpuDataPtr, sx * sy * sizeof(DepthPixel)); //¸´ÖÆÉî¶ÈÊı¾İ
-		RHIUnlockTexture2D(uTex2DRes, 0, true); //½âËø
+		// åŠ é”è·å–å¯è¯»depth Textureæ·±åº¦å€¼æ•°ç»„é¦–åœ°å€
+		memcpy(mydata.GetData(), cpuDataPtr, sx * sy * sizeof(DepthPixel)); //å¤åˆ¶æ·±åº¦æ•°æ®
+		RHIUnlockTexture2D(uTex2DRes, 0, true); //è§£é”
 		FSceneRenderTargets::Get(RHICmdList).AdjustGBufferRefCount(RHICmdList, -1);
 	});
-	FlushRenderingCommands(); //µÈ´ıäÖÈ¾Ïß³ÌÖ´ĞĞ
+	FlushRenderingCommands(); //ç­‰å¾…æ¸²æŸ“çº¿ç¨‹æ‰§è¡Œ
 
 	return mydata;
 }

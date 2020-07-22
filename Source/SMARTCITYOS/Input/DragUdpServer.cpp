@@ -9,7 +9,7 @@ void ADragUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("DragUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_DRAG, isSuccess);
+    StartUDPReceiver("DragUDPServer", "127.0.0.1", EOperationPort::FLY_MODE_DRAG, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Init falied!");

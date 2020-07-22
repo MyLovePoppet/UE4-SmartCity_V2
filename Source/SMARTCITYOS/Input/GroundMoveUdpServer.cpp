@@ -9,7 +9,7 @@ void AGroundMoveUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("GroundMoveServer", "192.168.1.1", EOperationPort::GROUND_MODE_MOVE, isSuccess);
+    StartUDPReceiver("GroundMoveServer", "127.0.0.1", EOperationPort::GROUND_MODE_MOVE, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Ground Move Server Init falied!");

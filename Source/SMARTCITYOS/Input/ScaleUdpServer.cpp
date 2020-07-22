@@ -9,7 +9,7 @@ void AScaleUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("ScaleUDPServer", "192.168.1.1", EOperationPort::FLY_MODE_SCALE, isSuccess);
+    StartUDPReceiver("ScaleUDPServer", "127.0.0.1", EOperationPort::FLY_MODE_SCALE, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Scale server Init falied!");

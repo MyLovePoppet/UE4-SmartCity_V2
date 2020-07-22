@@ -9,7 +9,7 @@ void AGroundCameraUdpServer::BeginPlay()
 {
     Super::BeginPlay();
     bool isSuccess;
-    StartUDPReceiver("GroundMoveServer", "192.168.1.1", EOperationPort::GROUND_MODE_CAMERA, isSuccess);
+    StartUDPReceiver("GroundMoveServer", "127.0.0.1", EOperationPort::GROUND_MODE_CAMERA, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Ground Camera Move Server Init falied!");
