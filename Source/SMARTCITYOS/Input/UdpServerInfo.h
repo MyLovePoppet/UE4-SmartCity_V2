@@ -12,7 +12,11 @@ enum class EOperationType:unsigned char
     FLY_MODE_ROTATE,
     //旋转       {type:"FLY_MODE_ROTATE",coordinateX:960.0,coordinateY:540.0,rotate:30.0}    rotate表示当前与上一次的旋转的角度（角度制）
 
+    //{type:"FLY_MODE_RETURN_NORTH"}
+    FLY_MODE_RETURN_NORTH,
 
+
+    
     //地面模式
     GROUND_MODE_MOVE,
     //移动    {type:"GROUND_MODE_MOVE",VeticalAxis:0.6,HorizontalAxis:0.8}        //axis为-1~1之间的值，操纵杆为单位圆，返回x值和y值即可 在按住不放或者是改变位置时发送数据
@@ -49,6 +53,7 @@ namespace PhonePCScreenSize
 
 namespace SendBackMessage
 {
-    const FString MESSAGE_MODE_CHANGE_TO_GROUND = TEXT("{type:\"MODE_CHANGE_TO_GROUND\"}");
-    const FString MESSAGE_MODE_CHANGE_TO_FLY = TEXT("{type:\"MODE_CHANGE_TO_FLY\"}");
+    const FString MESSAGE_MODE_CHANGE_TO_GROUND = TEXT("{\"type\":\"MODE_CHANGE_TO_GROUND\"}");
+    const FString MESSAGE_MODE_CHANGE_TO_FLY = TEXT("{\"type\":\"MODE_CHANGE_TO_FLY\"}");
+    const FString MESSAGE_SEND_BACK_CURRENT_DEGREE = TEXT("{\"type\":\"CURRENT_DEGREE\",\"degree\":?}");
 }

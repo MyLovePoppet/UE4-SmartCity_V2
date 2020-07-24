@@ -26,12 +26,10 @@ void AGroundCameraUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
         case EOperationType::GROUND_MODE_CAMERA_MOVE:
             {
                 float YawValue = JsonObject->GetNumberField("distanceX");
-                YawValue /= PhonePCScreenSize::PhoneScreenSize.X;
-                YawValue = FMath::Clamp(YawValue, -1.f, 1.f) * 180.f;
+                YawValue = FMath::Clamp(YawValue, -1.f, 1.f);
 
                 float PitchValue = JsonObject->GetNumberField("distanceY");
-                PitchValue /= PhonePCScreenSize::PhoneScreenSize.Y;
-                PitchValue = FMath::Clamp(PitchValue, -1.f, 1.f) * 180.f;
+                PitchValue = FMath::Clamp(PitchValue, -1.f, 1.f);
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
                     IInputBase->MouseX(YawValue);

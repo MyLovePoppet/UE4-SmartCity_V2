@@ -38,13 +38,13 @@ void UdpServerUtilities::InitOperationMap()
     OperationMap.Add(TEXT("FLY_MODE_DRAG"), EOperationType::FLY_MODE_DRAG);
     OperationMap.Add(TEXT("FLY_MODE_SCALE"), EOperationType::FLY_MODE_SCALE);
     OperationMap.Add(TEXT("FLY_MODE_ROTATE"), EOperationType::FLY_MODE_ROTATE);
+    OperationMap.Add(TEXT("FLY_MODE_RETURN_NORTH"), EOperationType::FLY_MODE_RETURN_NORTH);
+
 
     OperationMap.Add(TEXT("GROUND_MODE_MOVE"), EOperationType::GROUND_MODE_MOVE);
-
     OperationMap.Add(TEXT("GROUND_MODE_JUMP"), EOperationType::GROUND_MODE_JUMP);
     OperationMap.Add(TEXT("GROUND_MODE_START_SPRINT"), EOperationType::GROUND_MODE_START_SPRINT);
     OperationMap.Add(TEXT("GROUND_MODE_STOP_SPRINT"), EOperationType::GROUND_MODE_STOP_SPRINT);
-
     OperationMap.Add(TEXT("GROUND_MODE_CAMERA_MOVE"), EOperationType::GROUND_MODE_CAMERA_MOVE);
 }
 
@@ -89,7 +89,29 @@ bool UdpServerUtilities::SendDataWithUdp(const FString& Message, const FString& 
     //ScreenMsg("UDP Send Succcess! INFO Sent = ", ToSend);
     SenderSocket->Close();
     ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(SenderSocket);
-    GEngine->AddOnScreenDebugMessage(-1,100.f,FColor::Red,"Send"+Message);
+    GEngine->AddOnScreenDebugMessage(-1, 100.f, FColor::Red, "Send" + Message);
+    return true;
+}
+
+bool UdpServerUtilities::SendDataWithUdp(FSocket* YourSocket, FInternetAddr* YourRemoteAddress, const FString& Message)
+{
+    check(YourSocket->GetSocketType() == ESocketType::SOCKTYPE_Datagram);
+    //~~~~~~~~~~~~~~~~  
+    //发送消息  
+    int32 BytesSent = 0;
+    FString serialized = Message;
+    TCHAR* serializedChar = serialized.GetCharArray().GetData();
+    int32 size = FCString::Strlen(serializedChar);
+    int32 sent = 0;
+    YourSocket->SendTo((uint8*)TCHAR_TO_UTF8(serializedChar), size, BytesSent, *YourRemoteAddress); //发送给远端地址  
+    if (BytesSent <= 0)
+    {
+        const FString Str = "Socket is valid but the receiver received 0 bytes, make sure it is listening properly!";
+        UE_LOG(LogTemp, Error, TEXT("%s"), *Str);
+        //ScreenMsg(Str);  
+        return false;
+    }
+    //GEngine->AddOnScreenDebugMessage(-1, 100.f, FColor::Red, "Send" + Message);
     return true;
 }
 

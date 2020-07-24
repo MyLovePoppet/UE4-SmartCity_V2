@@ -45,7 +45,7 @@ AInputPawn::AInputPawn()
         CapsuleComponent->SetEnableGravity(false);
         RootComponent = CapsuleComponent;
         CapsuleComponent->GetBodyInstance()->COMNudge = FVector(0.0f, 0.0f, -96.0f);
-        CapsuleComponent->SetLinearDamping(0.15f);
+        CapsuleComponent->SetLinearDamping(2.f);
         CapsuleComponent->SetAngularDamping(100.0f);
         CapsuleComponent->SetNotifyRigidBodyCollision(true);
     }

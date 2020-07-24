@@ -17,7 +17,6 @@ protected:
 
     TQueue<TSharedPtr<FJsonObject>> OperationMessageQueue;
 
-    uint8 MAXFRAME = 10;
     // Sets default values for this actor's properties
     AUdpServerBase();
 

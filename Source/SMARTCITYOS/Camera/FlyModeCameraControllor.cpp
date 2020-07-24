@@ -14,8 +14,8 @@ FlyModeCameraControllor::FlyModeCameraControllor(float _EarthRadius) : CameraCon
 void FlyModeCameraControllor::Restart()
 {
     CameraControllor::Restart();
-	FVector ShenZhenLocation = FVector(-44090.35f, -122952.766f, 75192.59f);
-	//FVector ShenZhenLocation = FVector(1, 0, 0);
+    FVector ShenZhenLocation = FVector(-44090.35f, -122952.766f, 75192.59f);
+    //FVector ShenZhenLocation = FVector(1, 0, 0);
     CameraState->SetLocation(EarthLocation + 1.5f * ShenZhenLocation.GetSafeNormal() * VirtualRadius);
     CameraState->SetRotation(GetPointToCenterVector(CameraState->GetLocation()).Rotation());
 
@@ -205,7 +205,8 @@ void FlyModeCameraControllor::OnMouseMMove(FVector2D position, float value)
         oldMidCursorPt = currentMidCursorPt;
     }
 }
-void FlyModeCameraControllor::Rotate(FVector2D position,float value)
+
+void FlyModeCameraControllor::Rotate(FVector2D position, float value)
 {
     FVector WorldPos = FVector::ZeroVector;
     if (ViewPortToWorldSafety(position, WorldPos))
@@ -216,6 +217,7 @@ void FlyModeCameraControllor::Rotate(FVector2D position,float value)
         RotateEarthByAxis(value);
     }
 }
+
 void FlyModeCameraControllor::OnMouseRButtonDown(FVector2D position)
 {
     oldCursorPt = position;
@@ -250,7 +252,7 @@ void FlyModeCameraControllor::OnMouseRMove(FVector2D position, float value)
         //根据右键y偏移量得速率。
         float SpeedY = (currentCursorPt.Y - oldCursorPt.Y) / SizeY;
         //SpeedY = FMath::Clamp(SpeedY, -0.1f, 0.1f);
-        Zoom(position,SpeedY);
+        Zoom(position, SpeedY);
     }
 }
 
@@ -262,13 +264,13 @@ void FlyModeCameraControllor::OnMouseWheel(FVector2D position, float value)
         if (ViewPortToWorldSafety(position, WorldPos))
         {
             VirtualRadius = (WorldPos - EarthLocation).Size();
-            Zoom(position,value);
+            Zoom(position, value);
         }
     }
 }
 
 //放大/缩小,速率由Speed控制。
-void FlyModeCameraControllor::Zoom(FVector2D &position, float Speed)
+void FlyModeCameraControllor::Zoom(FVector2D& position, float Speed)
 {
     //GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Red, FString::SanitizeFloat(Speed));
 
