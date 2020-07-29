@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FSendCurrentDegreeRunnable.h"
 #include "UdpServerBase.h"
 #include "RotateUdpServer.generated.h"
 
@@ -14,13 +15,10 @@ class SMARTCITYOS_API ARotateUdpServer : public AUdpServerBase
 {
     GENERATED_BODY()
     float CurrentDegree = 0.f;
-    //创建可复用的Socket和RemoteAddress，方便发送，就不用后面发送一个创建一个了
-    FSocket* OurReuseAbleSocket;
-    TSharedPtr<FInternetAddr> OurReuseAbleRemoteAddress;
-    //初始化，返回是否成功
-    bool InitOurSocket(const FString& TheIP = TEXT("192.168.50.247"),
-                       const uint32 ThePort = EOperationPort::SEND_BACK_PORT,
-                       const FString& YourChosenSocketName = TEXT("SendBackDegree"));
+
+    //回发角度的线程
+    FSendCurrentDegreeRunnable* SendCurrentDegreeRunnable;
+    FRunnableThread* SendThread;
 
 protected:
     // Called when the game starts or when spawned

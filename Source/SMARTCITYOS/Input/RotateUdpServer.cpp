@@ -5,47 +5,30 @@
 
 #include "InputPawn.h"
 
-bool ARotateUdpServer::InitOurSocket(const FString& TheIP, const uint32 ThePort, const FString& YourChosenSocketName)
-{
-    OurReuseAbleRemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-    bool bIsValid;
-    OurReuseAbleRemoteAddress->SetIp(*TheIP, bIsValid);
-    OurReuseAbleRemoteAddress->SetPort(ThePort);
-    if (!bIsValid)
-    {
-        //ScreenMsg("Rama UDP Sender>> IP address was not valid!", TheIP);
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red,
-                                         TEXT("Rama UDP Sender>> IP address was not valid!"));
-        return false;
-    }
-    OurReuseAbleSocket = FUdpSocketBuilder(*YourChosenSocketName)
-                         .AsReusable()
-                         .WithBroadcast() /////////////广播  
-                         .WithSendBufferSize(1024);
-    //Set Send Buffer Size  
-    int32 SendSize = 1024;
-    OurReuseAbleSocket->SetSendBufferSize(SendSize, SendSize);
-    OurReuseAbleSocket->SetReceiveBufferSize(SendSize, SendSize);
-    return bIsValid;
-}
 
 void ARotateUdpServer::BeginPlay()
 {
     Super::BeginPlay();
-    InitOurSocket();
     bool isSuccess;
     StartUDPReceiver("RotateUDPServer", "127.0.0.1", EOperationPort::FLY_MODE_ROTATE, isSuccess);
     if (!isSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, "Rotate server Init falied!");
     }
+    //启动回发数据的线程
+    SendCurrentDegreeRunnable = new FSendCurrentDegreeRunnable();
+    SendThread = FRunnableThread::Create(SendCurrentDegreeRunnable, *FString("Send degree thread"));
 }
 
 void ARotateUdpServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
-    OurReuseAbleSocket->Close();
-    ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(OurReuseAbleSocket);
+
+    //关闭线程
+    SendThread->Kill(true);
+
+    delete SendCurrentDegreeRunnable;
+    delete SendThread;
 }
 
 void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
@@ -77,10 +60,8 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                     FString SendBackStr = SendBackMessage::MESSAGE_SEND_BACK_CURRENT_DEGREE.Replace(
                         *FString("?"), *FString::SanitizeFloat(CurrentDegree));
                     //GEngine->AddOnScreenDebugMessage(-1, 100.f, FColor::Red, SendBackStr);
-                    //回发数据
-                    //UdpServerUtilities::SendDataWithUdp(SendBackStr,TEXT("192.168.50.247"));
-                    UdpServerUtilities::SendDataWithUdp(OurReuseAbleSocket, OurReuseAbleRemoteAddress.Get(),
-                                                        SendBackStr);
+                    //回发数据，使用线程内新建的Enqueue函数即可
+                    SendCurrentDegreeRunnable->Enqueue(SendBackStr);
                 }
                 break;
             }
@@ -95,8 +76,9 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 
                 //@Todo 回到正北方向
 
-                UdpServerUtilities::SendDataWithUdp(OurReuseAbleSocket, OurReuseAbleRemoteAddress.Get(),
-                                                    SendBackStr);
+
+                //回发一个回到正北正南的数据
+                SendCurrentDegreeRunnable->Enqueue(SendBackStr);
                 GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Return to north");
             }
         case EOperationType::FLY_MODE_START:
