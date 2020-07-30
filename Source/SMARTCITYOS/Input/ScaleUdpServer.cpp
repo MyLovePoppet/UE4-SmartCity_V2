@@ -31,7 +31,7 @@ void AScaleUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 float Value = FMath::Sign(ScaleRate - 1.0f);
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
-                    IInputBase->OnMouseWheel(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), Value / 5.f);
+                    IInputBase->OnMouseWheel(UdpServerUtilities::ToPCLocation(FVector2D(X, Y)), Value / 3.f);
                     //IInputBase->Scale( Value/5.f);
                 }
                 break;

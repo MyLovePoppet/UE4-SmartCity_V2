@@ -32,8 +32,10 @@ void AGroundCameraUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
                 PitchValue = FMath::Clamp(PitchValue, -1.f, 1.f);
                 for (auto& IInputBase : AInputPawn::inputListeners)
                 {
-                    IInputBase->MouseX(YawValue);
-                    IInputBase->MouseY(PitchValue);
+                    if (YawValue != 0.f)
+                        IInputBase->MouseX(YawValue * 1.5f);
+                    if (PitchValue != 0.f)
+                        IInputBase->MouseY(PitchValue * 1.5f);
                 }
                 break;
             }

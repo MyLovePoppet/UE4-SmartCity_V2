@@ -78,7 +78,7 @@ void ARotateUdpServer::Handle(const TSharedPtr<FJsonObject>& JsonObject)
 
 
                 //回发一个回到正北正南的数据
-                SendCurrentDegreeRunnable->Enqueue(SendBackStr);
+                //SendCurrentDegreeRunnable->Enqueue(SendBackStr);
                 GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Return to north");
             }
         case EOperationType::FLY_MODE_START:
